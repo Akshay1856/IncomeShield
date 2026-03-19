@@ -1,0 +1,86 @@
+import { mockClaims, formatCurrency, formatDateTime, triggerTypeLabels, triggerTypeColors } from '@/lib/mockData';
+import { StatusBadge } from '@/components/DashboardWidgets';
+import { AlertTriangle, ShieldAlert } from 'lucide-react';
+
+export default function ClaimsPage() {
+  const flaggedClaims = mockClaims.filter(c => c.fraudFlag);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Claims History</h1>
+        <p className="text-muted-foreground">All automatically generated claims from trigger events</p>
+      </div>
+
+      {/* Fraud alert */}
+      {flaggedClaims.length > 0 && (
+        <div className="p-4 rounded-xl bg-danger/10 border border-danger/20 flex items-start gap-3 animate-slide-in">
+          <ShieldAlert className="h-5 w-5 text-danger mt-0.5" />
+          <div>
+            <p className="font-semibold text-danger">Suspicious Activity Detected</p>
+            <p className="text-sm text-danger/80">
+              {flaggedClaims.length} claim(s) flagged — multiple rapid claims from same location detected. Under review.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Claims table */}
+      <div className="elevated-card rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border bg-muted/50">
+                <th className="text-left text-xs font-semibold text-muted-foreground p-4">Claim ID</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-4">Trigger</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-4">Details</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground p-4">Lost Hours</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground p-4">Payout</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-4">Status</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-4">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mockClaims.map(claim => (
+                <tr key={claim.id} className={`border-b border-border/50 hover:bg-muted/30 transition-colors ${claim.fraudFlag ? 'bg-danger/5' : ''}`}>
+                  <td className="p-4 text-sm font-mono text-foreground">{claim.id}</td>
+                  <td className="p-4">
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${triggerTypeColors[claim.triggerType]}`}>
+                      {triggerTypeLabels[claim.triggerType]}
+                    </span>
+                  </td>
+                  <td className="p-4 text-sm text-muted-foreground max-w-48">{claim.triggerValue}</td>
+                  <td className="p-4 text-sm font-medium text-foreground text-right">{claim.lostHours} hrs</td>
+                  <td className="p-4 text-sm font-bold text-foreground text-right">{formatCurrency(claim.payoutAmount)}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={claim.status} />
+                      {claim.fraudFlag && <AlertTriangle className="h-4 w-4 text-danger" />}
+                    </div>
+                  </td>
+                  <td className="p-4 text-sm text-muted-foreground">{formatDateTime(claim.timestamp)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="elevated-card rounded-xl p-5 text-center">
+          <p className="text-sm text-muted-foreground">Total Claims</p>
+          <p className="text-3xl font-bold text-foreground">{mockClaims.length}</p>
+        </div>
+        <div className="elevated-card rounded-xl p-5 text-center">
+          <p className="text-sm text-muted-foreground">Total Payouts</p>
+          <p className="text-3xl font-bold text-safe">{formatCurrency(mockClaims.reduce((s, c) => s + c.payoutAmount, 0))}</p>
+        </div>
+        <div className="elevated-card rounded-xl p-5 text-center">
+          <p className="text-sm text-muted-foreground">Hours Covered</p>
+          <p className="text-3xl font-bold text-foreground">{mockClaims.reduce((s, c) => s + c.lostHours, 0)} hrs</p>
+        </div>
+      </div>
+    </div>
+  );
+}
