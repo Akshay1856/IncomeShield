@@ -11,6 +11,7 @@ import ClaimsPage from "@/pages/ClaimsPage";
 import TriggersPage from "@/pages/TriggersPage";
 import TransparencyPage from "@/pages/TransparencyPage";
 import AdminPage from "@/pages/AdminPage";
+import InstallPage from "@/pages/InstallPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/install" element={<InstallPage />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/policy" element={<PolicyPage />} />
