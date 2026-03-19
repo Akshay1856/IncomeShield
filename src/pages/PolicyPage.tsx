@@ -95,7 +95,7 @@ export default function PolicyPage() {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Work Type</label>
-            <Select value={simWork} onValueChange={setSimWork}>
+            <Select value={simWork} onValueChange={(v) => setSimWork(v as 'full-time' | 'part-time')}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="full-time">Full-time</SelectItem>
