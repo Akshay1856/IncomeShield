@@ -11,6 +11,7 @@ import ClaimsPage from "@/pages/ClaimsPage";
 import TriggersPage from "@/pages/TriggersPage";
 import TransparencyPage from "@/pages/TransparencyPage";
 import AdminPage from "@/pages/AdminPage";
+import InstallPage from "@/pages/InstallPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
