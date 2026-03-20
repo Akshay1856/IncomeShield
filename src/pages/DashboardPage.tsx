@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   mockPolicy, mockClaims, mockRiskScore, weeklyEarningsData, riskTrendData,
-  formatCurrency, formatDateTime, triggerTypeLabels,
+  formatCurrency, formatDateTime,
 } from '@/lib/mockData';
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
@@ -13,18 +13,23 @@ import { toast } from 'sonner';
 export default function DashboardPage() {
   const { user } = useAuth();
   const [triggerActive, setTriggerActive] = useState(false);
-  const [simulatedClaim, setSimulatedClaim] = useState<null | { amount: number; hours: number; txnId: string }>(null);
+  const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
+  const [simulationCount, setSimulationCount] = useState(0);
+
+  const totalSimulatedPayout = simulatedClaims.reduce((s, c) => s + c.amount, 0);
 
   const simulateTrigger = useCallback(() => {
     setTriggerActive(true);
+    setSimulationCount(prev => prev + 1);
     toast.warning('🌧️ Heavy Rainfall Detected — Trigger Activated!', {
       description: '65mm/hr rainfall in Mumbai - Andheri West',
     });
 
     setTimeout(() => {
-      const payout = 500;
+      const payout = 400 + Math.floor(Math.random() * 200);
+      const hours = 3 + Math.floor(Math.random() * 3);
       const txnId = 'TXN_RPY_' + Math.random().toString(36).slice(2, 9).toUpperCase();
-      setSimulatedClaim({ amount: payout, hours: 4, txnId });
+      setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId }]);
       toast.success(`✅ Payout of ${formatCurrency(payout)} credited!`, {
         description: `Transaction: ${txnId}`,
       });
@@ -33,24 +38,34 @@ export default function DashboardPage() {
 
   const resetSimulation = useCallback(() => {
     setTriggerActive(false);
-    setSimulatedClaim(null);
+    setSimulatedClaims([]);
+    setSimulationCount(0);
   }, []);
+
+  const latestClaim = simulatedClaims[simulatedClaims.length - 1];
+
+  // Dynamic values that update with simulation
+  const currentEarningsProtected = mockPolicy.earningsProtected + totalSimulatedPayout;
+  const currentLastPayout = latestClaim ? latestClaim.amount : mockClaims[0].payoutAmount;
+  const currentLastPayoutTime = latestClaim ? 'Just now' : formatDateTime(mockClaims[0].timestamp);
 
   return (
     <div className="space-y-4 lg:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0]} 👋</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
           <p className="text-sm text-muted-foreground">Your coverage snapshot this week</p>
         </div>
-        <div className="flex gap-2">
-          {!triggerActive ? (
-            <Button onClick={simulateTrigger} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto">
-              <CloudRain className="h-4 w-4" /> Simulate Rainstorm
-            </Button>
-          ) : (
+        <div className="flex gap-2 items-center">
+          {simulationCount > 0 && (
+            <span className="text-xs text-muted-foreground">Simulated: {simulationCount}x</span>
+          )}
+          <Button onClick={simulateTrigger} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto">
+            <CloudRain className="h-4 w-4" /> Simulate Rainstorm
+          </Button>
+          {simulationCount > 0 && (
             <Button onClick={resetSimulation} variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
-              Reset Demo
+              Reset
             </Button>
           )}
         </div>
@@ -64,34 +79,39 @@ export default function DashboardPage() {
             <p className="font-semibold text-danger text-sm">Trigger Activated</p>
             <p className="text-xs text-danger/80">Heavy rainfall (65mm/hr) detected. Auto-claim initiated.</p>
           </div>
-          {simulatedClaim && (
+          {latestClaim && (
             <div className="text-right shrink-0">
-              <p className="text-base font-bold text-safe">{formatCurrency(simulatedClaim.amount)}</p>
+              <p className="text-base font-bold text-safe">{formatCurrency(latestClaim.amount)}</p>
               <p className="text-[10px] text-muted-foreground">Credited</p>
             </div>
           )}
         </div>
       )}
 
-      {/* Payout confirmation */}
-      {simulatedClaim && (
+      {/* All payout confirmations */}
+      {simulatedClaims.length > 0 && (
         <div className="p-4 rounded-xl bg-safe/5 border border-safe/20 animate-slide-in">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle className="h-4 w-4 text-safe" />
-            <h3 className="font-semibold text-foreground text-sm">Payout Processed</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-safe" />
+              <h3 className="font-semibold text-foreground text-sm">
+                {simulatedClaims.length} Payout{simulatedClaims.length > 1 ? 's' : ''} Processed
+              </h3>
+            </div>
+            <p className="text-base font-bold text-safe">{formatCurrency(totalSimulatedPayout)}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] text-muted-foreground">Amount</p>
-              <p className="text-base font-bold text-foreground">{formatCurrency(simulatedClaim.amount)}</p>
+              <p className="text-[10px] text-muted-foreground">Latest Amount</p>
+              <p className="text-base font-bold text-foreground">{formatCurrency(latestClaim!.amount)}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Hours Covered</p>
-              <p className="text-base font-bold text-foreground">{simulatedClaim.hours} hrs</p>
+              <p className="text-base font-bold text-foreground">{latestClaim!.hours} hrs</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Transaction</p>
-              <p className="text-xs font-mono text-foreground break-all">{simulatedClaim.txnId}</p>
+              <p className="text-xs font-mono text-foreground break-all">{latestClaim!.txnId}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground">Status</p>
@@ -101,19 +121,19 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stats row */}
+      {/* Stats row - values update with simulations */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard title="Premium" value={formatCurrency(mockPolicy.totalPremium)} subtitle="Weekly" icon={Shield} variant="default" />
         <StatCard title="Coverage" value={formatCurrency(mockPolicy.coverageAmount)} subtitle="Max payout" icon={TrendingUp} variant="accent" />
-        <StatCard title="Protected" value={formatCurrency(mockPolicy.earningsProtected)} subtitle="This week" icon={Zap} variant="safe" />
-        <StatCard title="Last Payout" value={formatCurrency(mockClaims[0].payoutAmount)} subtitle={formatDateTime(mockClaims[0].timestamp)} icon={CheckCircle} variant="safe" />
+        <StatCard title="Protected" value={formatCurrency(currentEarningsProtected)} subtitle="This week" icon={Zap} variant="safe" />
+        <StatCard title="Last Payout" value={formatCurrency(currentLastPayout)} subtitle={currentLastPayoutTime} icon={CheckCircle} variant="safe" />
       </div>
 
       {/* Risk Score */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
         <h3 className="text-sm font-semibold text-foreground mb-4">AI Risk Score</h3>
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <RiskGauge score={mockRiskScore.overall} />
+          <RiskGauge score={Math.min(mockRiskScore.overall + simulationCount * 5, 99)} />
           <div className="flex-1">
             <RiskExplanation riskScore={mockRiskScore} />
           </div>
@@ -164,10 +184,10 @@ export default function DashboardPage() {
       {/* Savings callout */}
       <div className="rounded-xl p-4 bg-accent/10 border border-accent/20">
         <p className="text-sm lg:text-base font-semibold text-foreground">
-          💰 You saved {formatCurrency(1850)} this week
+          💰 You saved {formatCurrency(currentEarningsProtected)} this week
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          2 disruption events detected — payouts processed instantly.
+          {2 + simulationCount} disruption events detected — payouts processed instantly.
         </p>
       </div>
     </div>
