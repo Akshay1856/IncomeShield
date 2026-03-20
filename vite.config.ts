@@ -24,8 +24,8 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
       manifest: {
-        name: "RideShield - Income Protection",
-        short_name: "RideShield",
+        name: "GigGuard — Protecting Delivery Partners",
+        short_name: "GigGuard",
         description: "AI-powered income protection for delivery partners",
         theme_color: "#1a2654",
         background_color: "#f3f4f8",

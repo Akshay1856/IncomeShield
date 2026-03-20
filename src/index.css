@@ -36,7 +36,6 @@
 
     --radius: 0.75rem;
 
-    /* Custom tokens */
     --safe: 152 69% 41%;
     --safe-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
@@ -67,6 +66,56 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 230 40% 20%;
     --sidebar-ring: 230 65% 50%;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 220 20% 93%;
+
+    --card: 222 47% 11%;
+    --card-foreground: 220 20% 93%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 220 20% 93%;
+
+    --primary: 230 65% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 30% 16%;
+    --secondary-foreground: 220 20% 93%;
+
+    --muted: 222 30% 16%;
+    --muted-foreground: 220 15% 55%;
+
+    --accent: 168 64% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 30% 20%;
+    --input: 222 30% 20%;
+    --ring: 230 65% 55%;
+
+    --safe: 152 69% 41%;
+    --safe-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --danger: 0 72% 51%;
+    --danger-foreground: 0 0% 100%;
+
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 220 20% 70%;
+    --sidebar-primary: 230 65% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 30% 14%;
+    --sidebar-accent-foreground: 220 20% 93%;
+    --sidebar-border: 222 30% 14%;
+    --sidebar-ring: 230 65% 55%;
+
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+    --shadow-elevated: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+    --shadow-prominent: 0 10px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
   }
 }
 

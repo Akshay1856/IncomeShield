@@ -24,7 +24,7 @@ export default function TransparencyPage() {
             <div className="p-4 rounded-lg bg-muted/50 space-y-2">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Why Payout Was Triggered</h4>
               <p className="text-sm text-foreground">{claim.triggerValue} exceeded the parametric threshold</p>
-              <p className="text-sm text-muted-foreground">Auto-detected by RideShield AI monitoring system</p>
+              <p className="text-sm text-muted-foreground">Auto-detected by GigGuard AI monitoring system</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/50 space-y-2">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Data Used</h4>
