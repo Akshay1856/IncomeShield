@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [workType, setWorkType] = useState<'full-time' | 'part-time'>('full-time');
@@ -39,8 +40,27 @@ export default function LoginPage() {
   const { login, signup, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
+  const passwordStrength = useMemo(() => {
+    if (!password) return { level: 0, label: '', color: '' };
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 10) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    if (score <= 1) return { level: 1, label: 'Weak', color: 'bg-destructive' };
+    if (score <= 3) return { level: 2, label: 'Medium', color: 'bg-yellow-500' };
+    return { level: 3, label: 'Strong', color: 'bg-green-500' };
+  }, [password]);
+
+  const passwordsMatch = !confirmPassword || password === confirmPassword;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSignup && password !== confirmPassword) {
+      toast.error("Passwords don't match");
+      return;
+    }
     setLoading(true);
     if (isSignup) {
       const result = await signup({ name, email, password, city, workType });
@@ -172,7 +192,26 @@ export default function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" required />
+              {isSignup && password && (
+                <div className="space-y-1">
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= passwordStrength.level ? passwordStrength.color : 'bg-muted'}`} />
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Password strength: <span className="font-medium">{passwordStrength.label}</span></p>
+                </div>
+              )}
             </div>
+            {isSignup && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" required />
+                {!passwordsMatch && (
+                  <p className="text-xs text-destructive font-medium">Passwords don't match</p>
+                )}
+              </div>
+            )}
 
             <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
               {loading ? 'Please wait...' : isSignup ? 'Create Account' : 'Sign In'}
