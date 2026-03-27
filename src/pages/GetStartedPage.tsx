@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CloudRain, Shield, Zap, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import gigguardLogo from '@/assets/gigguard-logo.png';
+import RupeeLoadingAnimation from '@/components/RupeeLoadingAnimation';
 
 const container = {
   hidden: {},
@@ -21,73 +23,94 @@ const scaleIn = {
 
 export default function GetStartedPage() {
   const navigate = useNavigate();
+  const [showLoader, setShowLoader] = useState(false);
+
+  const handleGetStarted = () => {
+    setShowLoader(true);
+    setTimeout(() => {
+      navigate('/login');
+    }, 5000);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background overflow-hidden">
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center relative">
-        {/* Animated background blobs */}
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-primary/10 blur-3xl"
-          animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-accent/10 blur-3xl"
-          animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-        />
+    <>
+      <AnimatePresence>
+        {showLoader && <RupeeLoadingAnimation />}
+      </AnimatePresence>
 
-        <motion.div
-          className="relative z-10 max-w-lg space-y-8"
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
-          <motion.div variants={scaleIn} className="flex items-center justify-center">
-            <img src={gigguardLogo} alt="GigGuard Logo" className="h-20 w-20" />
-          </motion.div>
+      <div className="dark min-h-screen flex flex-col overflow-hidden" style={{ background: 'hsl(222, 47%, 8%)' }}>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center relative">
+          {/* Animated background blobs */}
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full blur-3xl"
+            style={{ background: 'hsl(230, 65%, 28% / 0.15)' }}
+            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl"
+            style={{ background: 'hsl(168, 64%, 42% / 0.1)' }}
+            animate={{ x: [0, -20, 0], y: [0, 30, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          />
 
-          <motion.h1 variants={fadeUp} className="text-5xl font-extrabold tracking-tight text-foreground">
-            GigGuard
-          </motion.h1>
+          <motion.div
+            className="relative z-10 max-w-lg space-y-8"
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.div variants={scaleIn} className="flex items-center justify-center">
+              <img src={gigguardLogo} alt="GigGuard Logo" className="h-20 w-20" />
+            </motion.div>
 
-          <motion.p variants={fadeUp} className="text-lg text-muted-foreground leading-relaxed">
-            Protecting Delivery Partners from Income Loss
-          </motion.p>
+            <motion.h1 variants={fadeUp} className="text-5xl font-extrabold tracking-tight" style={{ color: 'hsl(220, 20%, 93%)' }}>
+              GigGuard
+            </motion.h1>
 
-          <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 pt-6">
-            {[
-              { icon: CloudRain, title: 'Rain Cover', desc: 'Get paid when weather stops you' },
-              { icon: Shield, title: '₹199/mo', desc: 'Affordable micro-insurance' },
-              { icon: Zap, title: 'Instant', desc: 'Auto-payouts in minutes' },
-            ].map((f) => (
-              <motion.div
-                key={f.title}
-                whileHover={{ y: -4, boxShadow: '0 8px 24px hsl(var(--primary) / 0.15)' }}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border transition-colors"
+            <motion.p variants={fadeUp} className="text-lg leading-relaxed" style={{ color: 'hsl(220, 9%, 60%)' }}>
+              Protecting Delivery Partners from Income Loss
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 pt-6">
+              {[
+                { icon: CloudRain, title: 'Rain Cover', desc: 'Get paid when weather stops you' },
+                { icon: Shield, title: '₹199/mo', desc: 'Affordable micro-insurance' },
+                { icon: Zap, title: 'Instant', desc: 'Auto-payouts in minutes' },
+              ].map((f) => (
+                <motion.div
+                  key={f.title}
+                  whileHover={{ y: -4, boxShadow: '0 8px 24px hsl(230, 65%, 28% / 0.3)' }}
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl transition-colors"
+                  style={{
+                    background: 'hsl(222, 47%, 11%)',
+                    border: '1px solid hsl(222, 30%, 18%)',
+                  }}
+                >
+                  <f.icon className="h-7 w-7" style={{ color: 'hsl(168, 64%, 42%)' }} />
+                  <span className="font-semibold text-sm" style={{ color: 'hsl(220, 20%, 93%)' }}>{f.title}</span>
+                  <span className="text-xs text-center" style={{ color: 'hsl(220, 9%, 55%)' }}>{f.desc}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div variants={fadeUp}>
+              <Button
+                size="lg"
+                className="mt-8 h-14 px-10 text-lg font-bold gap-2 rounded-full"
+                onClick={handleGetStarted}
+                disabled={showLoader}
               >
-                <f.icon className="h-7 w-7 text-primary" />
-                <span className="font-semibold text-sm text-foreground">{f.title}</span>
-                <span className="text-xs text-muted-foreground text-center">{f.desc}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+                Get Started <ArrowRight className="h-5 w-5" />
+              </Button>
+            </motion.div>
 
-          <motion.div variants={fadeUp}>
-            <Button
-              size="lg"
-              className="mt-8 h-14 px-10 text-lg font-bold gap-2 rounded-full"
-              onClick={() => navigate('/login')}
-            >
-              Get Started <ArrowRight className="h-5 w-5" />
-            </Button>
+            <motion.p variants={fadeUp} className="text-xs pt-2" style={{ color: 'hsl(220, 9%, 50%)' }}>
+              No credit card required · Cancel anytime
+            </motion.p>
           </motion.div>
-
-          <motion.p variants={fadeUp} className="text-xs text-muted-foreground pt-2">
-            No credit card required · Cancel anytime
-          </motion.p>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
