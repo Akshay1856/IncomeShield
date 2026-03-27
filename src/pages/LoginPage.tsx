@@ -5,8 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CloudRain, Thermometer, Zap } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { CloudRain, Thermometer, Zap, Eye, EyeOff, CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { format, parse, differenceInYears, isValid } from 'date-fns';
+import { cn } from '@/lib/utils';
 import gigguardLogo from '@/assets/gigguard-logo.png';
 
 const INDIAN_CITIES = [
@@ -33,9 +37,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [workType, setWorkType] = useState<'full-time' | 'part-time'>('full-time');
+  const [dob, setDob] = useState<Date | undefined>(undefined);
+  const [dobText, setDobText] = useState('');
   const [loading, setLoading] = useState(false);
   const { login, signup, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -55,10 +63,43 @@ export default function LoginPage() {
 
   const passwordsMatch = !confirmPassword || password === confirmPassword;
 
+  const dobError = useMemo(() => {
+    if (!dob) return '';
+    const age = differenceInYears(new Date(), dob);
+    if (age < 18) return 'You must be at least 18 years old';
+    return '';
+  }, [dob]);
+
+  const handleDobTextChange = (text: string) => {
+    setDobText(text);
+    // Try parsing dd-mm-yyyy
+    if (text.length === 10) {
+      const parsed = parse(text, 'dd-MM-yyyy', new Date());
+      if (isValid(parsed)) {
+        setDob(parsed);
+      }
+    }
+  };
+
+  const handleCalendarSelect = (date: Date | undefined) => {
+    setDob(date);
+    if (date) {
+      setDobText(format(date, 'dd-MM-yyyy'));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSignup && password !== confirmPassword) {
       toast.error("Passwords don't match");
+      return;
+    }
+    if (isSignup && !dob) {
+      toast.error('Please enter your date of birth');
+      return;
+    }
+    if (isSignup && dobError) {
+      toast.error(dobError);
       return;
     }
     setLoading(true);
@@ -119,7 +160,9 @@ export default function LoginPage() {
             <span className="text-2xl font-bold text-foreground">GigGuard</span>
             <p className="text-xs text-muted-foreground">Protecting Delivery Partners from Income Loss</p>
           </div>
-          <div>
+
+          {/* Centered headings */}
+          <div className="text-center">
             <h2 className="text-2xl font-bold text-foreground">
               {isSignup ? 'Create your account' : 'Welcome back'}
             </h2>
@@ -183,6 +226,41 @@ export default function LoginPage() {
                     </Select>
                   </div>
                 </div>
+
+                {/* Date of Birth */}
+                <div className="space-y-2">
+                  <Label>Date of Birth</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="dd-mm-yyyy"
+                      value={dobText}
+                      onChange={e => handleDobTextChange(e.target.value)}
+                      maxLength={10}
+                      className="flex-1"
+                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="icon" type="button">
+                          <CalendarIcon className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={dob}
+                          onSelect={handleCalendarSelect}
+                          disabled={(date) => date > new Date() || date < new Date('1940-01-01')}
+                          initialFocus
+                          className={cn('p-3 pointer-events-auto')}
+                          defaultMonth={dob || new Date(2000, 0)}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  {dobError && (
+                    <p className="text-xs text-destructive font-medium">{dobError}</p>
+                  )}
+                </div>
               </>
             )}
             <div className="space-y-2">
@@ -191,7 +269,24 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 6 characters" required />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Min. 6 characters"
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {isSignup && password && (
                 <div className="space-y-1">
                   <div className="flex gap-1">
@@ -206,7 +301,24 @@ export default function LoginPage() {
             {isSignup && (
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" required />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 {!passwordsMatch && (
                   <p className="text-xs text-destructive font-medium">Passwords don't match</p>
                 )}
