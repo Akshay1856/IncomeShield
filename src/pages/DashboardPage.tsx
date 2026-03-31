@@ -13,6 +13,8 @@ import { useWeatherData } from '@/hooks/useWeatherData';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const city = user?.city || 'Mumbai';
+  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(city);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
