@@ -7,14 +7,17 @@ import {
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWeatherData } from '@/hooks/useWeatherData';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const city = user?.city || 'Mumbai';
-  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(city);
+  const geo = useGeolocation();
+  // Use GPS-detected city for weather (anti-fraud), fallback to profile city
+  const detectedCity = geo.city || user?.city || 'Mumbai';
+  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
@@ -57,7 +60,23 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
-          <p className="text-sm text-muted-foreground">Your coverage snapshot this week</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+            {geo.loading ? (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" /> Detecting location…
+              </span>
+            ) : geo.error ? (
+              <span className="text-sm text-warning">
+                📍 Location access denied — using profile city ({user?.city || 'Mumbai'})
+              </span>
+            ) : (
+              <span className="text-sm text-foreground font-medium">
+                {geo.locality ? `${geo.locality}, ` : ''}{geo.city || detectedCity}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">Your coverage snapshot this week</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {simulationCount > 0 && (
