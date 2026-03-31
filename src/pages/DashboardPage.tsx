@@ -250,8 +250,8 @@ export default function DashboardPage() {
   );
 }
 
-function MonitorCard({ label, value, status, icon, threshold }: {
-  label: string; value: string; status: 'safe' | 'warning' | 'danger'; icon: string; threshold: string;
+function MonitorCard({ label, value, status, icon, threshold, subtitle }: {
+  label: string; value: string; status: 'safe' | 'warning' | 'danger'; icon: string; threshold: string; subtitle?: string;
 }) {
   const bg = status === 'safe' ? 'bg-safe/5 border-safe/20' : status === 'warning' ? 'bg-warning/5 border-warning/20' : 'bg-danger/5 border-danger/20';
   const dot = status === 'safe' ? 'bg-safe' : status === 'warning' ? 'bg-warning' : 'bg-danger';
@@ -264,6 +264,7 @@ function MonitorCard({ label, value, status, icon, threshold }: {
       </div>
       <p className="text-xs font-medium text-foreground">{label}</p>
       <p className="text-lg font-bold text-foreground">{value}</p>
+      {subtitle && <p className="text-[10px] text-muted-foreground">{subtitle}</p>}
       <p className={`text-[10px] font-semibold mt-1 ${status === 'safe' ? 'text-safe' : status === 'warning' ? 'text-warning' : 'text-danger'}`}>
         {statusLabel}
       </p>
