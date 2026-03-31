@@ -7,11 +7,14 @@ import {
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useWeatherData } from '@/hooks/useWeatherData';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const city = user?.city || 'Mumbai';
+  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(city);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
@@ -56,10 +59,14 @@ export default function DashboardPage() {
           <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
           <p className="text-sm text-muted-foreground">Your coverage snapshot this week</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           {simulationCount > 0 && (
             <span className="text-xs text-muted-foreground">Simulated: {simulationCount}x</span>
           )}
+          <Button onClick={() => refetchWeather()} variant="outline" size="sm" className="gap-2" disabled={weatherLoading}>
+            {weatherLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Refresh Weather
+          </Button>
           <Button onClick={simulateTrigger} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto">
             <CloudRain className="h-4 w-4" /> Simulate Rainstorm
           </Button>
@@ -172,13 +179,62 @@ export default function DashboardPage() {
 
       {/* Environmental Monitors */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
-        <h3 className="text-sm font-semibold text-foreground mb-3">Live Monitors</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <MonitorCard label="Rainfall" value={triggerActive ? '65 mm/hr' : '12 mm/hr'} status={triggerActive ? 'danger' : 'safe'} icon="🌧️" threshold="40mm" />
-          <MonitorCard label="Temp" value="34°C" status="warning" icon="🌡️" threshold="43°C" />
-          <MonitorCard label="AQI" value="185" status="warning" icon="🏭" threshold="300" />
-          <MonitorCard label="Platform" value="Online" status="safe" icon="⚡" threshold="Active" />
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-foreground">Live Monitors</h3>
+          {weatherData && (
+            <div className="flex items-center gap-2">
+              {weatherData.conditions.icon && (
+                <img src={weatherData.conditions.icon} alt={weatherData.conditions.description} className="w-8 h-8" />
+              )}
+              <span className="text-xs text-muted-foreground capitalize">{weatherData.conditions.description}</span>
+              <span className="text-[10px] text-muted-foreground">• {weatherData.city}</span>
+            </div>
+          )}
+          {weatherLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
+        {weatherError && (
+          <div className="p-2 mb-3 rounded-lg bg-danger/10 border border-danger/20 text-xs text-danger">
+            ⚠️ Weather unavailable: {weatherError}. Showing defaults.
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <MonitorCard
+            label="Rainfall"
+            value={triggerActive ? '65 mm/hr' : (weatherData?.monitors.rainfall.value || '— mm/hr')}
+            status={triggerActive ? 'danger' : (weatherData?.monitors.rainfall.status || 'safe')}
+            icon="🌧️"
+            threshold="40mm"
+            subtitle={weatherData ? `Humidity: ${weatherData.conditions.humidity}%` : undefined}
+          />
+          <MonitorCard
+            label="Temp"
+            value={weatherData?.monitors.temperature.value || '—°C'}
+            status={weatherData?.monitors.temperature.status || 'safe'}
+            icon="🌡️"
+            threshold="45°C"
+            subtitle={weatherData ? `Feels like: ${weatherData.monitors.temperature.feelsLike}°C` : undefined}
+          />
+          <MonitorCard
+            label="AQI"
+            value={weatherData?.monitors.aqi.value || '—'}
+            status={weatherData?.monitors.aqi.status || 'safe'}
+            icon="🏭"
+            threshold="300"
+            subtitle={weatherData ? `PM2.5: ${weatherData.monitors.aqi.pm25}` : undefined}
+          />
+          <MonitorCard
+            label="Wind"
+            value={weatherData ? `${weatherData.conditions.windSpeed} km/h` : '— km/h'}
+            status={weatherData && weatherData.conditions.windSpeed > 50 ? 'danger' : weatherData && weatherData.conditions.windSpeed > 30 ? 'warning' : 'safe'}
+            icon="💨"
+            threshold="50 km/h"
+          />
+        </div>
+        {weatherData && (
+          <p className="text-[10px] text-muted-foreground mt-2 text-right">
+            Updated: {new Date(weatherData.timestamp).toLocaleTimeString('en-IN')} • Auto-refreshes every 5 min
+          </p>
+        )}
       </div>
 
       {/* Savings callout */}
@@ -194,8 +250,8 @@ export default function DashboardPage() {
   );
 }
 
-function MonitorCard({ label, value, status, icon, threshold }: {
-  label: string; value: string; status: 'safe' | 'warning' | 'danger'; icon: string; threshold: string;
+function MonitorCard({ label, value, status, icon, threshold, subtitle }: {
+  label: string; value: string; status: 'safe' | 'warning' | 'danger'; icon: string; threshold: string; subtitle?: string;
 }) {
   const bg = status === 'safe' ? 'bg-safe/5 border-safe/20' : status === 'warning' ? 'bg-warning/5 border-warning/20' : 'bg-danger/5 border-danger/20';
   const dot = status === 'safe' ? 'bg-safe' : status === 'warning' ? 'bg-warning' : 'bg-danger';
@@ -208,6 +264,7 @@ function MonitorCard({ label, value, status, icon, threshold }: {
       </div>
       <p className="text-xs font-medium text-foreground">{label}</p>
       <p className="text-lg font-bold text-foreground">{value}</p>
+      {subtitle && <p className="text-[10px] text-muted-foreground">{subtitle}</p>}
       <p className={`text-[10px] font-semibold mt-1 ${status === 'safe' ? 'text-safe' : status === 'warning' ? 'text-warning' : 'text-danger'}`}>
         {statusLabel}
       </p>
