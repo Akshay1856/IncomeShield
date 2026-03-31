@@ -60,7 +60,23 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
-          <p className="text-sm text-muted-foreground">Your coverage snapshot this week</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+            {geo.loading ? (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" /> Detecting location…
+              </span>
+            ) : geo.error ? (
+              <span className="text-sm text-warning">
+                📍 Location access denied — using profile city ({user?.city || 'Mumbai'})
+              </span>
+            ) : (
+              <span className="text-sm text-foreground font-medium">
+                {geo.locality ? `${geo.locality}, ` : ''}{geo.city || detectedCity}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">Your coverage snapshot this week</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {simulationCount > 0 && (
