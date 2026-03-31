@@ -15,12 +15,12 @@ import gigguardLogo from '@/assets/gigguard-logo.png';
 
 const INDIAN_CITIES = [
   'Agartala','Agra','Ahmedabad','Ahmednagar','Aizawl','Ajmer','Akola','Aligarh','Allahabad','Ambala',
-  'Amravati','Amritsar','Anand','Anantapur','Aurangabad','Bareilly','Bathinda','Belgaum','Bellary','Berhampore',
-  'Bhagalpur','Bharatpur','Bharuch','Bhavnagar','Bhilai','Bhilwara','Bhopal','Bhubaneswar','Bikaner','Bilaspur',
-  'Bokaro','Brahmapur','Bulandshahr','Chandigarh','Chennai','Coimbatore','Cuttack','Darbhanga','Davangere',
-  'Dehradun','Delhi','Dhanbad','Dharwad','Dibrugarh','Durg','Durgapur','Erode','Faridabad','Firozabad',
-  'Gangtok','Gaya','Ghaziabad','Gorakhpur','Gulbarga','Guntur','Gurgaon','Guwahati','Gwalior','Hapur',
-  'Hisar','Hospet','Howrah','Hubli','Hyderabad','Imphal','Indore','Itanagar','Jabalpur','Jaipur',
+  'Amravati','Amritsar','Anand','Anantapur','Aurangabad','Bareilly','Bathinda','Belgaum','Bellary','Bengaluru',
+  'Berhampore','Bhagalpur','Bharatpur','Bharuch','Bhavnagar','Bhilai','Bhilwara','Bhopal','Bhubaneswar','Bikaner',
+  'Bilaspur','Bokaro','Brahmapur','Bulandshahr','Chandigarh','Chennai','Coimbatore','Cuttack','Darbhanga',
+  'Davangere','Dehradun','Delhi','Dhanbad','Dharwad','Dibrugarh','Durg','Durgapur','Erode','Faridabad',
+  'Firozabad','Gangtok','Gaya','Ghaziabad','Gorakhpur','Gulbarga','Guntur','Gurgaon','Guwahati','Gwalior',
+  'Hapur','Hisar','Hospet','Howrah','Hubli','Hyderabad','Imphal','Indore','Itanagar','Jabalpur','Jaipur',
   'Jalandhar','Jalgaon','Jammu','Jamnagar','Jamshedpur','Jhansi','Jodhpur','Junagadh','Kakinada','Kalyan',
   'Kanpur','Karimnagar','Karnal','Kochi','Kohima','Kolhapur','Kolkata','Kollam','Kota','Kottayam',
   'Kozhikode','Kurnool','Latur','Lucknow','Ludhiana','Madurai','Malegaon','Mangalore','Mathura','Meerut',
