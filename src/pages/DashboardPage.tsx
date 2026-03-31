@@ -7,8 +7,9 @@ import {
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useWeatherData } from '@/hooks/useWeatherData';
 
 export default function DashboardPage() {
   const { user } = useAuth();
