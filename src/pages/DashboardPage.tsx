@@ -59,10 +59,14 @@ export default function DashboardPage() {
           <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
           <p className="text-sm text-muted-foreground">Your coverage snapshot this week</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           {simulationCount > 0 && (
             <span className="text-xs text-muted-foreground">Simulated: {simulationCount}x</span>
           )}
+          <Button onClick={() => refetchWeather()} variant="outline" size="sm" className="gap-2" disabled={weatherLoading}>
+            {weatherLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Refresh Weather
+          </Button>
           <Button onClick={simulateTrigger} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto">
             <CloudRain className="h-4 w-4" /> Simulate Rainstorm
           </Button>
