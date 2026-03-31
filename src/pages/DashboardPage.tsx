@@ -7,14 +7,17 @@ import {
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWeatherData } from '@/hooks/useWeatherData';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const city = user?.city || 'Mumbai';
-  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(city);
+  const geo = useGeolocation();
+  // Use GPS-detected city for weather (anti-fraud), fallback to profile city
+  const detectedCity = geo.city || user?.city || 'Mumbai';
+  const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
