@@ -133,8 +133,8 @@ export default function LoginPage() {
         </div>
         <div className="relative z-10 text-center space-y-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={gigguardLogo} alt="GigGuard Logo" className="h-16 w-16" />
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">GigGuard</h1>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16" />
+            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">IncomeShield</h1>
           </div>
           <p className="text-lg text-primary-foreground/80 max-w-md">
             Protecting Delivery Partners from Income Loss
