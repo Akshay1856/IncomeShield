@@ -11,7 +11,8 @@ import { CloudRain, Thermometer, Zap, Eye, EyeOff, CalendarIcon } from 'lucide-r
 import { toast } from 'sonner';
 import { format, parse, differenceInYears, isValid } from 'date-fns';
 import { cn } from '@/lib/utils';
-import gigguardLogo from '@/assets/gigguard-logo.png';
+import incomeshieldLogo from '@/assets/incomeshield-logo.png';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const INDIAN_CITIES = [
   'Agartala','Agra','Ahmedabad','Ahmednagar','Aizawl','Ajmer','Akola','Aligarh','Allahabad','Ambala',
@@ -132,12 +133,13 @@ export default function LoginPage() {
         </div>
         <div className="relative z-10 text-center space-y-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={gigguardLogo} alt="GigGuard Logo" className="h-16 w-16" />
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">GigGuard</h1>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16" />
+            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">IncomeShield</h1>
           </div>
-          <p className="text-lg text-primary-foreground/80 max-w-md">
-            Protecting Delivery Partners from Income Loss
-          </p>
+            <p className="text-lg text-primary-foreground/80 max-w-md">
+              Protecting Delivery Partners from Income Loss
+            </p>
+            <p className="text-sm text-primary-foreground/60 mt-2">Sign in to your IncomeShield dashboard</p>
           <div className="grid grid-cols-3 gap-6 mt-12">
             <FeatureIcon icon={CloudRain} label="Rain Protection" />
             <FeatureIcon icon={Thermometer} label="Heatwave Cover" />
@@ -156,9 +158,12 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden flex flex-col items-center gap-2 mb-4">
-            <img src={gigguardLogo} alt="GigGuard Logo" className="h-12 w-12" />
-            <span className="text-2xl font-bold text-foreground">GigGuard</span>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-12 w-12" />
+            <span className="text-2xl font-bold text-foreground">IncomeShield</span>
             <p className="text-xs text-muted-foreground">Protecting Delivery Partners from Income Loss</p>
+          </div>
+          <div className="flex justify-end mb-2">
+            <LanguageSelector compact />
           </div>
 
           {/* Centered headings */}
@@ -167,17 +172,17 @@ export default function LoginPage() {
               {isSignup ? 'Create your account' : 'Welcome back'}
             </h2>
             <p className="mt-1 text-muted-foreground">
-              {isSignup ? 'Start protecting your income today' : 'Sign in to your GigGuard dashboard'}
+              {isSignup ? 'Start protecting your income today' : 'Sign in to your IncomeShield dashboard'}
             </p>
           </div>
 
           {/* Google Sign In */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-11 gap-3 text-base"
-            onClick={signInWithGoogle}
-          >
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 gap-3 text-base btn-3d"
+              onClick={signInWithGoogle}
+            >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -325,14 +330,14 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base font-semibold btn-3d" disabled={loading}>
               {loading ? 'Please wait...' : isSignup ? 'Create Account' : 'Sign In'}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button onClick={() => setIsSignup(!isSignup)} className="text-primary font-medium hover:underline">
+            <button onClick={() => setIsSignup(!isSignup)} className="text-primary font-medium hover:underline btn-3d">
               {isSignup ? 'Sign in' : 'Sign up'}
             </button>
           </p>

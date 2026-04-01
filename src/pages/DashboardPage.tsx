@@ -6,29 +6,45 @@ import {
 } from '@/lib/mockData';
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, MapPin } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, MapPin, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import LanguageSelector from '@/components/LanguageSelector';
+
+const DISRUPTION_TYPES = [
+  'Heavy Rainfall / Flooding',
+  'Heatwave (>45°C)',
+  'Severe Air Pollution (AQI >300)',
+  'Cyclone / Storm',
+  'Road Blockage / Waterlogging',
+  'Platform Server Downtime',
+  'Accident / Vehicle Breakdown',
+];
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const geo = useGeolocation();
-  // Use GPS-detected city for weather (anti-fraud), fallback to profile city
   const detectedCity = geo.city || user?.city || 'Mumbai';
   const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
+  const [showSimForm, setShowSimForm] = useState(false);
+  const [simDisruption, setSimDisruption] = useState('');
 
   const totalSimulatedPayout = simulatedClaims.reduce((s, c) => s + c.amount, 0);
 
-  const simulateTrigger = useCallback(() => {
+  const handleSimulateSubmit = useCallback(() => {
+    setShowSimForm(false);
     setTriggerActive(true);
     setSimulationCount(prev => prev + 1);
-    toast.warning('🌧️ Heavy Rainfall Detected — Trigger Activated!', {
-      description: '65mm/hr rainfall in Mumbai - Andheri West',
+    toast.warning(`⚠️ ${simDisruption || 'Weather Disruption'} Detected — Trigger Activated!`, {
+      description: `Location: ${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`,
     });
 
     setTimeout(() => {
@@ -36,11 +52,9 @@ export default function DashboardPage() {
       const hours = 3 + Math.floor(Math.random() * 3);
       const txnId = 'TXN_RPY_' + Math.random().toString(36).slice(2, 9).toUpperCase();
       setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId }]);
-      toast.success(`✅ Payout of ${formatCurrency(payout)} credited!`, {
-        description: `Transaction: ${txnId}`,
-      });
+      toast.success(`✅ Payout of ${formatCurrency(payout)} credited!`, { description: `Transaction: ${txnId}` });
     }, 2500);
-  }, []);
+  }, [simDisruption, geo.locality, detectedCity]);
 
   const resetSimulation = useCallback(() => {
     setTriggerActive(false);
@@ -49,8 +63,6 @@ export default function DashboardPage() {
   }, []);
 
   const latestClaim = simulatedClaims[simulatedClaims.length - 1];
-
-  // Dynamic values that update with simulation
   const currentEarningsProtected = mockPolicy.earningsProtected + totalSimulatedPayout;
   const currentLastPayout = latestClaim ? latestClaim.amount : mockClaims[0].payoutAmount;
   const currentLastPayoutTime = latestClaim ? 'Just now' : formatDateTime(mockClaims[0].timestamp);
@@ -68,7 +80,7 @@ export default function DashboardPage() {
               </span>
             ) : geo.error ? (
               <span className="text-sm text-warning">
-                📍 Location access denied — using profile city ({user?.city || 'Mumbai'})
+                Location access denied — using profile city ({user?.city || 'Mumbai'})
               </span>
             ) : (
               <span className="text-sm text-foreground font-medium">
@@ -82,20 +94,65 @@ export default function DashboardPage() {
           {simulationCount > 0 && (
             <span className="text-xs text-muted-foreground">Simulated: {simulationCount}x</span>
           )}
-          <Button onClick={() => refetchWeather()} variant="outline" size="sm" className="gap-2" disabled={weatherLoading}>
+          <Button onClick={() => refetchWeather()} variant="outline" size="sm" className="gap-2 btn-3d" disabled={weatherLoading}>
             {weatherLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Refresh Weather
           </Button>
-          <Button onClick={simulateTrigger} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto">
-            <CloudRain className="h-4 w-4" /> Simulate Rainstorm
+          <Button onClick={() => setShowSimForm(true)} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto btn-3d">
+            <CloudRain className="h-4 w-4" /> Simulate Disruption
           </Button>
           {simulationCount > 0 && (
-            <Button onClick={resetSimulation} variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
+            <Button onClick={resetSimulation} variant="outline" size="sm" className="gap-2 w-full sm:w-auto btn-3d">
               Reset
             </Button>
           )}
         </div>
       </div>
+
+      {/* Simulate Form Modal */}
+      {showSimForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setShowSimForm(false)}>
+          <div className="bg-card rounded-2xl p-6 w-full max-w-md mx-4 space-y-4 border border-border" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-foreground">Simulate Disruption</h3>
+              <button onClick={() => setShowSimForm(false)} className="p-1 rounded-lg hover:bg-muted btn-3d">
+                <X className="h-5 w-5 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <Label className="text-xs text-muted-foreground">Name</Label>
+                <Input value={user?.name || ''} disabled className="bg-muted/50" />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Location (GPS)</Label>
+                <Input value={`${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`} disabled className="bg-muted/50" />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Current Weather</Label>
+                <Input value={weatherData ? `${weatherData.conditions.description}, ${weatherData.monitors.temperature.value}` : 'Loading...'} disabled className="bg-muted/50" />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground">Type of Disruption</Label>
+                <Select value={simDisruption} onValueChange={setSimDisruption}>
+                  <SelectTrigger><SelectValue placeholder="Select disruption type" /></SelectTrigger>
+                  <SelectContent>
+                    {DISRUPTION_TYPES.map(d => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="pt-1">
+                <LanguageSelector compact />
+              </div>
+            </div>
+            <Button onClick={handleSimulateSubmit} className="w-full btn-3d" disabled={!simDisruption}>
+              Submit Claim
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Trigger Alert Banner */}
       {triggerActive && (
@@ -103,7 +160,7 @@ export default function DashboardPage() {
           <AlertTriangle className="h-5 w-5 text-danger animate-pulse-glow shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-danger text-sm">Trigger Activated</p>
-            <p className="text-xs text-danger/80">Heavy rainfall (65mm/hr) detected. Auto-claim initiated.</p>
+            <p className="text-xs text-danger/80">{simDisruption || 'Disruption'} detected. Auto-claim initiated.</p>
           </div>
           {latestClaim && (
             <div className="text-right shrink-0">
@@ -147,7 +204,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stats row - values update with simulations */}
+      {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard title="Premium" value={formatCurrency(mockPolicy.totalPremium)} subtitle="Weekly" icon={Shield} variant="default" />
         <StatCard title="Coverage" value={formatCurrency(mockPolicy.coverageAmount)} subtitle="Max payout" icon={TrendingUp} variant="accent" />

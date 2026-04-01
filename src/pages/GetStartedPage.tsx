@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CloudRain, Shield, Zap, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import gigguardLogo from '@/assets/gigguard-logo.png';
+import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import RupeeLoadingAnimation from '@/components/RupeeLoadingAnimation';
+import IPhoneMockup from '@/components/IPhoneMockup';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const container = {
   hidden: {},
@@ -28,8 +30,8 @@ export default function GetStartedPage() {
   const handleGetStarted = () => {
     setShowLoader(true);
     setTimeout(() => {
-      navigate('/login');
-    }, 5000);
+      navigate('/plans');
+    }, 2000);
   };
 
   return (
@@ -38,8 +40,13 @@ export default function GetStartedPage() {
         {showLoader && <RupeeLoadingAnimation />}
       </AnimatePresence>
 
-      <div className="dark min-h-screen flex flex-col overflow-hidden" style={{ background: 'hsl(222, 47%, 8%)' }}>
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center relative">
+      <div className="dark min-h-screen flex flex-col overflow-hidden" style={{ background: 'hsl(222, 47%, 6%)' }}>
+        {/* Language selector top-right */}
+        <div className="absolute top-4 right-4 z-20">
+          <LanguageSelector compact />
+        </div>
+
+        <div className="flex-1 flex flex-col lg:flex-row items-center justify-center px-6 py-12 gap-12 relative">
           {/* Animated background blobs */}
           <motion.div
             className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full blur-3xl"
@@ -54,18 +61,19 @@ export default function GetStartedPage() {
             transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
           />
 
+          {/* Left: Content */}
           <motion.div
-            className="relative z-10 max-w-lg space-y-8"
+            className="relative z-10 max-w-lg space-y-8 text-center lg:text-left"
             variants={container}
             initial="hidden"
             animate="show"
           >
-            <motion.div variants={scaleIn} className="flex items-center justify-center">
-              <img src={gigguardLogo} alt="GigGuard Logo" className="h-20 w-20" />
+            <motion.div variants={scaleIn} className="flex items-center justify-center lg:justify-start">
+              <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-20 w-20 invert" />
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-5xl font-extrabold tracking-tight" style={{ color: 'hsl(220, 20%, 93%)' }}>
-              GigGuard
+              IncomeShield
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-lg leading-relaxed" style={{ color: 'hsl(220, 9%, 60%)' }}>
@@ -75,13 +83,13 @@ export default function GetStartedPage() {
             <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 pt-6">
               {[
                 { icon: CloudRain, title: 'Rain Cover', desc: 'Get paid when weather stops you' },
-                { icon: Shield, title: '₹199/mo', desc: 'Affordable micro-insurance' },
+                { icon: Shield, title: '₹99/mo', desc: 'Affordable micro-insurance' },
                 { icon: Zap, title: 'Instant', desc: 'Auto-payouts in minutes' },
               ].map((f) => (
                 <motion.div
                   key={f.title}
                   whileHover={{ y: -4, boxShadow: '0 8px 24px hsl(230, 65%, 28% / 0.3)' }}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl transition-colors"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl transition-colors btn-3d"
                   style={{
                     background: 'hsl(222, 47%, 11%)',
                     border: '1px solid hsl(222, 30%, 18%)',
@@ -97,7 +105,7 @@ export default function GetStartedPage() {
             <motion.div variants={fadeUp}>
               <Button
                 size="lg"
-                className="mt-8 h-14 px-10 text-lg font-bold gap-2 rounded-full"
+                className="mt-8 h-14 px-10 text-lg font-bold gap-2 rounded-full btn-3d"
                 onClick={handleGetStarted}
                 disabled={showLoader}
               >
@@ -106,9 +114,14 @@ export default function GetStartedPage() {
             </motion.div>
 
             <motion.p variants={fadeUp} className="text-xs pt-2" style={{ color: 'hsl(220, 9%, 50%)' }}>
-              No credit card required · Cancel anytime
+              15 days free trial · No credit card required
             </motion.p>
           </motion.div>
+
+          {/* Right: iPhone Mockup */}
+          <div className="hidden lg:block relative z-10">
+            <IPhoneMockup />
+          </div>
         </div>
       </div>
     </>
