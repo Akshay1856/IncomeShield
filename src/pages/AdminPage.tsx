@@ -36,7 +36,7 @@ function downloadPDF() {
       .stat .label { color: #888; font-size: 12px; }
       .stat .value { font-size: 24px; font-weight: bold; }
     </style></head><body>
-    <h1>GigGuard — Admin Report</h1>
+    <h1>IncomeShield — Admin Report</h1>
     <h2>Platform Analytics & Payout Summary</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;">
       <div class="stat"><p class="label">Total Users</p><p class="value">${adminStats.totalUsers.toLocaleString()}</p></div>
