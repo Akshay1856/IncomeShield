@@ -13,7 +13,7 @@ function downloadCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'gigguard_admin_data.csv';
+  a.download = 'incomeshield_admin_data.csv';
   a.click();
   URL.revokeObjectURL(url);
   toast.success('CSV downloaded!');
