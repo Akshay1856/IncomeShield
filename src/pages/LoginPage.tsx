@@ -172,7 +172,7 @@ export default function LoginPage() {
               {isSignup ? 'Create your account' : 'Welcome back'}
             </h2>
             <p className="mt-1 text-muted-foreground">
-              {isSignup ? 'Start protecting your income today' : 'Sign in to your GigGuard dashboard'}
+              {isSignup ? 'Start protecting your income today' : 'Sign in to your IncomeShield dashboard'}
             </p>
           </div>
 
