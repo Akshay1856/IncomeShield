@@ -22,7 +22,7 @@ function downloadCSV() {
 function downloadPDF() {
   // Generate a simple HTML-based PDF
   const content = `
-    <html><head><title>GigGuard Admin Report</title>
+    <html><head><title>IncomeShield Admin Report</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
       h1 { color: #1a2654; margin-bottom: 8px; }
