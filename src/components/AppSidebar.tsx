@@ -11,78 +11,102 @@ import {
   Menu,
   X,
   IndianRupee,
+  CreditCard,
+  PanelLeftClose,
+  PanelLeft,
 } from 'lucide-react';
 import { useState } from 'react';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import gigguardLogo from '@/assets/gigguard-logo.png';
+import incomeshieldLogo from '@/assets/incomeshield-logo.png';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/policy', label: 'Policy', icon: FileText },
   { to: '/claims', label: 'Claims', icon: ShieldCheck },
   { to: '/payouts', label: 'Payouts', icon: IndianRupee },
+  { to: '/subscription', label: 'Subscription', icon: CreditCard },
   { to: '/triggers', label: 'Triggers', icon: AlertTriangle },
   { to: '/transparency', label: 'Transparency', icon: Eye },
   { to: '/admin', label: 'Admin', icon: BarChart3 },
 ];
 
-const bottomNavItems = navItems.slice(0, 4);
+const bottomNavItems = navItems.slice(0, 5);
 
 export default function AppSidebar() {
   const { logout, user } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 min-h-screen flex-col" style={{ backgroundColor: 'hsl(230, 50%, 14%)' }}>
-        <div className="p-6 flex items-center gap-3">
-          <img src={gigguardLogo} alt="GigGuard" className="h-8 w-8" />
-          <div>
-            <span className="text-xl font-bold" style={{ color: 'hsl(0, 0%, 100%)' }}>GigGuard</span>
-            <p className="text-[10px]" style={{ color: 'hsl(220, 20%, 60%)' }}>Protecting Delivery Partners</p>
-          </div>
+      <aside
+        className={`hidden lg:flex min-h-screen flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}
+        style={{ backgroundColor: 'hsl(222, 47%, 6%)' }}
+      >
+        <div className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
+          <img src={incomeshieldLogo} alt="IncomeShield" className="h-8 w-8 invert shrink-0" />
+          {!collapsed && (
+            <div>
+              <span className="text-xl font-bold" style={{ color: 'hsl(0, 0%, 100%)' }}>IncomeShield</span>
+              <p className="text-[10px]" style={{ color: 'hsl(220, 20%, 60%)' }}>Protecting Delivery Partners</p>
+            </div>
+          )}
         </div>
 
-        <nav className="flex-1 px-3 space-y-1">
+        {/* Collapse toggle */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="mx-3 mb-2 flex items-center justify-center p-2 rounded-lg transition-colors"
+          style={{ color: 'hsl(220, 20%, 60%)' }}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </button>
+
+        <nav className="flex-1 px-2 space-y-1">
           {navItems.map(item => {
             const isActive = location.pathname === item.to;
             return (
               <RouterNavLink
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                title={item.label}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all btn-3d ${
                   isActive
                     ? 'bg-primary text-primary-foreground'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent'
-                }`}
+                } ${collapsed ? 'justify-center' : ''}`}
               >
-                <item.icon className="h-4 w-4" />
-                {item.label}
+                <item.icon className="h-4 w-4 shrink-0" />
+                {!collapsed && item.label}
               </RouterNavLink>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground text-sm font-bold">
-              {user?.name?.charAt(0) || 'G'}
+        <div className={`p-3 border-t border-sidebar-border space-y-2 ${collapsed ? 'px-1' : ''}`}>
+          {!collapsed && <LanguageSelector compact />}
+          <div className={`flex items-center gap-3 px-3 py-2 ${collapsed ? 'justify-center' : ''}`}>
+            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground text-sm font-bold shrink-0">
+              {user?.name?.charAt(0) || 'U'}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: 'hsl(0, 0%, 95%)' }}>{user?.name || 'User'}</p>
-              <p className="text-xs truncate" style={{ color: 'hsl(220, 20%, 60%)' }}>{user?.city || ''}</p>
-            </div>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate" style={{ color: 'hsl(0, 0%, 95%)' }}>{user?.name || 'User'}</p>
+                <p className="text-xs truncate" style={{ color: 'hsl(220, 20%, 60%)' }}>{user?.city || ''}</p>
+              </div>
+            )}
           </div>
-          <ThemeToggle />
           <button
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-2 rounded-lg text-sm transition-colors"
+            title="Sign Out"
+            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors btn-3d ${collapsed ? 'justify-center' : ''}`}
             style={{ color: 'hsl(220, 20%, 60%)' }}
           >
-            <LogOut className="h-4 w-4" />
-            Sign Out
+            <LogOut className="h-4 w-4 shrink-0" />
+            {!collapsed && 'Sign Out'}
           </button>
         </div>
       </aside>
@@ -90,12 +114,15 @@ export default function AppSidebar() {
       {/* Mobile Top Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 border-b border-border bg-card">
         <div className="flex items-center gap-2">
-          <img src={gigguardLogo} alt="GigGuard" className="h-7 w-7" />
-          <span className="text-lg font-bold text-foreground">GigGuard</span>
+          <img src={incomeshieldLogo} alt="IncomeShield" className="h-7 w-7 invert" />
+          <span className="text-lg font-bold text-foreground">IncomeShield</span>
         </div>
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-lg hover:bg-muted">
-          {mobileMenuOpen ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSelector compact />
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-lg hover:bg-muted btn-3d">
+            {mobileMenuOpen ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Slide-down Menu */}
@@ -109,7 +136,7 @@ export default function AppSidebar() {
                   key={item.to}
                   to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors btn-3d ${
                     isActive ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'
                   }`}
                 >
@@ -122,19 +149,16 @@ export default function AppSidebar() {
           <div className="absolute bottom-20 left-0 right-0 p-4 border-t border-border">
             <div className="flex items-center gap-3 px-4 py-3">
               <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold">
-                {user?.name?.charAt(0) || 'G'}
+                {user?.name?.charAt(0) || 'U'}
               </div>
               <div className="flex-1">
                 <p className="font-medium text-foreground">{user?.name || 'User'}</p>
                 <p className="text-sm text-muted-foreground">{user?.city || ''}</p>
               </div>
             </div>
-            <div className="px-4 py-2">
-              <ThemeToggle />
-            </div>
             <button
               onClick={() => { logout(); setMobileMenuOpen(false); }}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base text-destructive hover:bg-destructive/10 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base text-destructive hover:bg-destructive/10 transition-colors btn-3d"
             >
               <LogOut className="h-5 w-5" />
               Sign Out

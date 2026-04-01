@@ -4,9 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import AppLayout from "@/components/AppLayout";
 import LoginPage from "@/pages/LoginPage";
 import GetStartedPage from "@/pages/GetStartedPage";
+import SubscriptionPage from "@/pages/SubscriptionPage";
 import DashboardPage from "@/pages/DashboardPage";
 import PolicyPage from "@/pages/PolicyPage";
 import ClaimsPage from "@/pages/ClaimsPage";
@@ -33,6 +35,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <GetStartedPage />} />
+      <Route path="/plans" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SubscriptionPage />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
       <Route path="/install" element={<InstallPage />} />
       <Route element={<AppLayout />}>
@@ -43,6 +46,7 @@ function AppRoutes() {
         <Route path="/triggers" element={<TriggersPage />} />
         <Route path="/transparency" element={<TransparencyPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -52,14 +56,16 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <AppRoutes />
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
