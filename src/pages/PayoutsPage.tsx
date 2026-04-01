@@ -29,7 +29,7 @@ const avgPayout = totalPayout / recentPayouts.filter(p => p.status === 'paid').l
 const paymentMethods = [
   { name: 'Bank Transfer (NEFT/IMPS)', icon: Landmark, desc: 'Direct to your bank account', active: true },
   { name: 'UPI', icon: Smartphone, desc: 'Google Pay, PhonePe, Paytm', active: true },
-  { name: 'Wallet', icon: Wallet, desc: 'GigGuard wallet balance', active: false },
+  { name: 'Wallet', icon: Wallet, desc: 'IncomeShield wallet balance', active: false },
 ];
 
 const faqs = [
