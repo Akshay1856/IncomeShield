@@ -329,7 +329,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base font-semibold btn-3d" disabled={loading}>
               {loading ? 'Please wait...' : isSignup ? 'Create Account' : 'Sign In'}
             </Button>
           </form>
