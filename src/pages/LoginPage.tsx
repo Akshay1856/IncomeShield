@@ -157,9 +157,12 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md space-y-8">
           <div className="lg:hidden flex flex-col items-center gap-2 mb-4">
-            <img src={gigguardLogo} alt="GigGuard Logo" className="h-12 w-12" />
-            <span className="text-2xl font-bold text-foreground">GigGuard</span>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-12 w-12" />
+            <span className="text-2xl font-bold text-foreground">IncomeShield</span>
             <p className="text-xs text-muted-foreground">Protecting Delivery Partners from Income Loss</p>
+          </div>
+          <div className="flex justify-end mb-2">
+            <LanguageSelector compact />
           </div>
 
           {/* Centered headings */}
