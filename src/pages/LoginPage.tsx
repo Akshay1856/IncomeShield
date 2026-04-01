@@ -136,9 +136,10 @@ export default function LoginPage() {
             <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16" />
             <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">IncomeShield</h1>
           </div>
-          <p className="text-lg text-primary-foreground/80 max-w-md">
-            Protecting Delivery Partners from Income Loss
-          </p>
+            <p className="text-lg text-primary-foreground/80 max-w-md">
+              Protecting Delivery Partners from Income Loss
+            </p>
+            <p className="text-sm text-primary-foreground/60 mt-2">Sign in to your IncomeShield dashboard</p>
           <div className="grid grid-cols-3 gap-6 mt-12">
             <FeatureIcon icon={CloudRain} label="Rain Protection" />
             <FeatureIcon icon={Thermometer} label="Heatwave Cover" />
