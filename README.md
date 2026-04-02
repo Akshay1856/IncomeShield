@@ -1,4 +1,4 @@
-## **GigGuard – AI-Powered Income Protection for Delivery Partners**
+## **IncomeShield – AI-Powered Income Protection for Delivery Partners**
 
 🛡️ Protecting delivery partners from income loss due to real-world disruptions.
 
@@ -145,7 +145,7 @@ We chose a **web-based platform** for Phase 1 because:
 
 ## **🌐 Live Prototype**
 
-🔗 **https://gigguard.lovable.app/** 
+🔗 **https://incomeshield.lovable.app** 
 
 
 ## **🎯 Vision**
@@ -158,6 +158,7 @@ Building the future of **gig economy insurance** 🚀
 **Team Members:**
 1. Shruthi Saravanan
 2. Ardhra Parakkal Thachapully Shajisagar
-3. Naresh Ponmani
-4. Devansh Shishodia
-5. Akshaya Raj
+3. Janvi Ramachandran
+4. Naresh Ponmani
+5. Devansh Shishodia
+6. Akshaya Raj
