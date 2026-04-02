@@ -335,6 +335,14 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          {!isSignup && (
+            <div className="text-center">
+              <button onClick={() => navigate('/forgot-password')} className="text-sm text-primary hover:underline btn-3d">
+                Forgot Password?
+              </button>
+            </div>
+          )}
+
           <p className="text-center text-sm text-muted-foreground">
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button onClick={() => setIsSignup(!isSignup)} className="text-primary font-medium hover:underline btn-3d">
