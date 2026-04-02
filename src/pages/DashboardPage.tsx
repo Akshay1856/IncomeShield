@@ -73,7 +73,6 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <MapPin className="h-3.5 w-3.5 text-primary" />
             {geo.loading ? (
               <span className="text-sm text-muted-foreground flex items-center gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" /> Detecting location…
