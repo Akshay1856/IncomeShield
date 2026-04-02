@@ -125,21 +125,21 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 relative overflow-hidden">
+      {/* Left panel - branding (dark readable theme) */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 relative overflow-hidden" style={{ background: 'hsl(222, 47%, 8%)' }}>
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-primary-foreground blur-3xl" />
+          <div className="absolute top-20 left-20 w-64 h-64 rounded-full blur-3xl" style={{ background: 'hsl(168, 64%, 42%)' }} />
+          <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full blur-3xl" style={{ background: 'hsl(230, 65%, 28%)' }} />
         </div>
         <div className="relative z-10 text-center space-y-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16" />
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">IncomeShield</h1>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16 invert" />
+            <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'hsl(220, 20%, 93%)' }}>IncomeShield</h1>
           </div>
-            <p className="text-lg text-primary-foreground/80 max-w-md">
+            <p className="text-lg max-w-md" style={{ color: 'hsl(220, 20%, 75%)' }}>
               Protecting Delivery Partners from Income Loss
             </p>
-            <p className="text-sm text-primary-foreground/60 mt-2">Sign in to your IncomeShield dashboard</p>
+            <p className="text-sm mt-2" style={{ color: 'hsl(220, 9%, 55%)' }}>Sign in to your IncomeShield dashboard</p>
           <div className="grid grid-cols-3 gap-6 mt-12">
             <FeatureIcon icon={CloudRain} label="Rain Protection" />
             <FeatureIcon icon={Thermometer} label="Heatwave Cover" />
