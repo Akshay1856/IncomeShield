@@ -145,11 +145,11 @@ export default function LoginPage() {
             <FeatureIcon icon={Thermometer} label="Heatwave Cover" />
             <FeatureIcon icon={Zap} label="Instant Payouts" />
           </div>
-          <div className="mt-12 p-6 rounded-xl bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20">
-            <p className="text-primary-foreground/90 text-lg font-medium">
+          <div className="mt-12 p-6 rounded-xl backdrop-blur-sm" style={{ background: 'hsl(222, 47%, 12%)', border: '1px solid hsl(222, 30%, 18%)' }}>
+            <p className="text-lg font-medium" style={{ color: 'hsl(220, 20%, 85%)' }}>
               "Saved ₹2,500 last monsoon season when I couldn't ride due to flooding"
             </p>
-            <p className="text-primary-foreground/60 mt-2 text-sm">— Amit K., Zomato rider, Mumbai</p>
+            <p className="mt-2 text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>— Amit K., Zomato rider, Mumbai</p>
           </div>
         </div>
       </div>
