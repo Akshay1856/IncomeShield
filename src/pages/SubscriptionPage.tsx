@@ -65,7 +65,7 @@ export default function SubscriptionPage() {
 
   const handleContinueFree = () => {
     setShowLoader(true);
-    setTimeout(() => navigate('/login'), 2000);
+    setTimeout(() => navigate('/role-select'), 2000);
   };
 
   return (
