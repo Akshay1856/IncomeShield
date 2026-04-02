@@ -358,10 +358,10 @@ export default function LoginPage() {
 function FeatureIcon({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="w-14 h-14 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-        <Icon className="h-7 w-7 text-accent" />
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: 'hsl(220, 20%, 15%)' }}>
+        <Icon className="h-7 w-7" style={{ color: 'hsl(168, 64%, 42%)' }} />
       </div>
-      <span className="text-xs text-primary-foreground/70">{label}</span>
+      <span className="text-xs" style={{ color: 'hsl(220, 20%, 65%)' }}>{label}</span>
     </div>
   );
 }
