@@ -1,5 +1,6 @@
 import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   LayoutDashboard,
   FileText,
@@ -19,24 +20,25 @@ import { useState } from 'react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
 
-const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/policy', label: 'Policy', icon: FileText },
-  { to: '/claims', label: 'Claims', icon: ShieldCheck },
-  { to: '/payouts', label: 'Payouts', icon: IndianRupee },
-  { to: '/subscription', label: 'Subscription', icon: CreditCard },
-  { to: '/triggers', label: 'Triggers', icon: AlertTriangle },
-  { to: '/transparency', label: 'Transparency', icon: Eye },
-  { to: '/admin', label: 'Admin', icon: BarChart3 },
-];
-
-const bottomNavItems = navItems.slice(0, 5);
-
 export default function AppSidebar() {
   const { logout, user } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+
+  const navItems = [
+    { to: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+    { to: '/policy', label: t('policy'), icon: FileText },
+    { to: '/claims', label: t('claims'), icon: ShieldCheck },
+    { to: '/payouts', label: t('payouts'), icon: IndianRupee },
+    { to: '/subscription', label: t('subscription'), icon: CreditCard },
+    { to: '/triggers', label: t('triggers'), icon: AlertTriangle },
+    { to: '/transparency', label: t('transparency'), icon: Eye },
+    { to: '/admin', label: t('admin'), icon: BarChart3 },
+  ];
+
+  const bottomNavItems = navItems.slice(0, 5);
 
   return (
     <>
@@ -48,22 +50,21 @@ export default function AppSidebar() {
         <div className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
           <img src={incomeshieldLogo} alt="IncomeShield" className="h-8 w-8 invert shrink-0" />
           {!collapsed && (
-            <div>
+            <div className="flex-1 min-w-0">
               <span className="text-xl font-bold" style={{ color: 'hsl(0, 0%, 100%)' }}>IncomeShield</span>
-              <p className="text-[10px]" style={{ color: 'hsl(220, 20%, 60%)' }}>Protecting Delivery Partners</p>
+              <p className="text-[10px]" style={{ color: 'hsl(220, 20%, 60%)' }}>{t('tagline')}</p>
             </div>
           )}
+          {/* Collapse toggle next to name */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg transition-colors hover:bg-white/10 shrink-0"
+            style={{ color: 'hsl(220, 20%, 60%)' }}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
         </div>
-
-        {/* Collapse toggle */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="mx-3 mb-2 flex items-center justify-center p-2 rounded-lg transition-colors"
-          style={{ color: 'hsl(220, 20%, 60%)' }}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </button>
 
         <nav className="flex-1 px-2 space-y-1">
           {navItems.map(item => {
@@ -101,12 +102,12 @@ export default function AppSidebar() {
           </div>
           <button
             onClick={logout}
-            title="Sign Out"
+            title={t('signOut')}
             className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors btn-3d ${collapsed ? 'justify-center' : ''}`}
             style={{ color: 'hsl(220, 20%, 60%)' }}
           >
             <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && 'Sign Out'}
+            {!collapsed && t('signOut')}
           </button>
         </div>
       </aside>
@@ -161,7 +162,7 @@ export default function AppSidebar() {
               className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base text-destructive hover:bg-destructive/10 transition-colors btn-3d"
             >
               <LogOut className="h-5 w-5" />
-              Sign Out
+              {t('signOut')}
             </button>
           </div>
         </div>

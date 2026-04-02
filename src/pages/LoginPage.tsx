@@ -125,31 +125,31 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-center items-center p-12 relative overflow-hidden">
+      {/* Left panel - branding (dark readable theme) */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 relative overflow-hidden" style={{ background: 'hsl(222, 47%, 8%)' }}>
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-accent blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-primary-foreground blur-3xl" />
+          <div className="absolute top-20 left-20 w-64 h-64 rounded-full blur-3xl" style={{ background: 'hsl(168, 64%, 42%)' }} />
+          <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full blur-3xl" style={{ background: 'hsl(230, 65%, 28%)' }} />
         </div>
         <div className="relative z-10 text-center space-y-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16" />
-            <h1 className="text-4xl font-bold text-primary-foreground tracking-tight">IncomeShield</h1>
+            <img src={incomeshieldLogo} alt="IncomeShield Logo" className="h-16 w-16 invert" />
+            <h1 className="text-4xl font-bold tracking-tight" style={{ color: 'hsl(220, 20%, 93%)' }}>IncomeShield</h1>
           </div>
-            <p className="text-lg text-primary-foreground/80 max-w-md">
+            <p className="text-lg max-w-md" style={{ color: 'hsl(220, 20%, 75%)' }}>
               Protecting Delivery Partners from Income Loss
             </p>
-            <p className="text-sm text-primary-foreground/60 mt-2">Sign in to your IncomeShield dashboard</p>
+            <p className="text-sm mt-2" style={{ color: 'hsl(220, 9%, 55%)' }}>Sign in to your IncomeShield dashboard</p>
           <div className="grid grid-cols-3 gap-6 mt-12">
             <FeatureIcon icon={CloudRain} label="Rain Protection" />
             <FeatureIcon icon={Thermometer} label="Heatwave Cover" />
             <FeatureIcon icon={Zap} label="Instant Payouts" />
           </div>
-          <div className="mt-12 p-6 rounded-xl bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20">
-            <p className="text-primary-foreground/90 text-lg font-medium">
+          <div className="mt-12 p-6 rounded-xl backdrop-blur-sm" style={{ background: 'hsl(222, 47%, 12%)', border: '1px solid hsl(222, 30%, 18%)' }}>
+            <p className="text-lg font-medium" style={{ color: 'hsl(220, 20%, 85%)' }}>
               "Saved ₹2,500 last monsoon season when I couldn't ride due to flooding"
             </p>
-            <p className="text-primary-foreground/60 mt-2 text-sm">— Amit K., Zomato rider, Mumbai</p>
+            <p className="mt-2 text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>— Amit K., Zomato rider, Mumbai</p>
           </div>
         </div>
       </div>
@@ -335,6 +335,14 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          {!isSignup && (
+            <div className="text-center">
+              <button onClick={() => navigate('/forgot-password')} className="text-sm text-primary hover:underline btn-3d">
+                Forgot Password?
+              </button>
+            </div>
+          )}
+
           <p className="text-center text-sm text-muted-foreground">
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button onClick={() => setIsSignup(!isSignup)} className="text-primary font-medium hover:underline btn-3d">
@@ -350,10 +358,10 @@ export default function LoginPage() {
 function FeatureIcon({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className="w-14 h-14 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-        <Icon className="h-7 w-7 text-accent" />
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: 'hsl(220, 20%, 15%)' }}>
+        <Icon className="h-7 w-7" style={{ color: 'hsl(168, 64%, 42%)' }} />
       </div>
-      <span className="text-xs text-primary-foreground/70">{label}</span>
+      <span className="text-xs" style={{ color: 'hsl(220, 20%, 65%)' }}>{label}</span>
     </div>
   );
 }
