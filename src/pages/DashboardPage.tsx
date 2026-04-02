@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, MapPin, X } from 'lucide-react';
+import { Shield, TrendingUp, CloudRain, Zap, AlertTriangle, CheckCircle, RefreshCw, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useGeolocation } from '@/hooks/useGeolocation';
