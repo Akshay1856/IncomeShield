@@ -17,6 +17,9 @@ import TransparencyPage from "@/pages/TransparencyPage";
 import AdminPage from "@/pages/AdminPage";
 import PayoutsPage from "@/pages/PayoutsPage";
 import InstallPage from "@/pages/InstallPage";
+import RoleSelectPage from "@/pages/RoleSelectPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,7 +39,10 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <GetStartedPage />} />
       <Route path="/plans" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SubscriptionPage />} />
+      <Route path="/role-select" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RoleSelectPage />} />
       <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/install" element={<InstallPage />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
