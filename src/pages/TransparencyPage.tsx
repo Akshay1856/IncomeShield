@@ -1,16 +1,18 @@
 import { mockClaims, triggerTypeLabels, formatCurrency, formatDateTime } from '@/lib/mockData';
 import { Eye } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function TransparencyPage() {
+  const { t } = useTranslation();
   const paidClaims = mockClaims.filter(c => c.status === 'paid');
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Eye className="h-6 w-6 text-primary" /> Transparency Ledger
+          <Eye className="h-6 w-6 text-primary" /> {t('transparencyLedger')}
         </h1>
-        <p className="text-muted-foreground">Complete explanation of every payout decision</p>
+        <p className="text-muted-foreground">{t('completeExplanation')}</p>
       </div>
 
       {paidClaims.map(claim => (
@@ -22,17 +24,17 @@ export default function TransparencyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Why Payout Was Triggered</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('whyPayoutTriggered')}</h4>
               <p className="text-sm text-foreground">{claim.triggerValue} exceeded the parametric threshold</p>
               <p className="text-sm text-muted-foreground">Auto-detected by IncomeShield AI monitoring system</p>
             </div>
             <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Data Used</h4>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('dataUsed')}</h4>
               <ul className="text-sm text-foreground space-y-1">
-                <li>• Trigger: {claim.triggerValue}</li>
-                <li>• Lost working hours: {claim.lostHours} hrs</li>
+                <li>• {t('trigger')}: {claim.triggerValue}</li>
+                <li>• {t('lostHours')}: {claim.lostHours} hrs</li>
                 <li>• Rate: {formatCurrency(125)}/hr</li>
-                <li>• Time: {formatDateTime(claim.timestamp)}</li>
+                <li>• {t('time')}: {formatDateTime(claim.timestamp)}</li>
               </ul>
             </div>
           </div>
