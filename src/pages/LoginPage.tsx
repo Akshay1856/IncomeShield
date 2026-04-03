@@ -13,6 +13,7 @@ import { format, parse, differenceInYears, isValid } from 'date-fns';
 import { cn } from '@/lib/utils';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
+import ScootyBackground from '@/components/ScootyBackground';
 
 const INDIAN_CITIES = [
   'Agartala','Agra','Ahmedabad','Ahmednagar','Aizawl','Ajmer','Akola','Aligarh','Allahabad','Ambala',
