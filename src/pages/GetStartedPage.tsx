@@ -7,6 +7,7 @@ import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import RupeeLoadingAnimation from '@/components/RupeeLoadingAnimation';
 import IPhoneMockup from '@/components/IPhoneMockup';
 import LanguageSelector from '@/components/LanguageSelector';
+import ScootyBackground from '@/components/ScootyBackground';
 
 const container = {
   hidden: {},
