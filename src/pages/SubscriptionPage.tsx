@@ -7,10 +7,12 @@ import { AnimatePresence } from 'framer-motion';
 import RupeeLoadingAnimation from '@/components/RupeeLoadingAnimation';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
+import ScootyBackground from '@/components/ScootyBackground';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const plans = [
   {
-    name: 'Basic Shield',
+    nameKey: 'basicShield' as const,
     icon: Shield,
     weeklyPrice: 29,
     monthlyPrice: 99,
@@ -23,7 +25,7 @@ const plans = [
     popular: false,
   },
   {
-    name: 'Pro Shield',
+    nameKey: 'proShield' as const,
     icon: Zap,
     weeklyPrice: 59,
     monthlyPrice: 199,
@@ -37,7 +39,7 @@ const plans = [
     popular: true,
   },
   {
-    name: 'Max Shield',
+    nameKey: 'maxShield' as const,
     icon: Crown,
     weeklyPrice: 99,
     monthlyPrice: 349,
@@ -55,6 +57,7 @@ const plans = [
 
 export default function SubscriptionPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [billing, setBilling] = useState<'weekly' | 'monthly'>('monthly');
   const [showLoader, setShowLoader] = useState(false);
 
@@ -74,24 +77,29 @@ export default function SubscriptionPage() {
         {showLoader && <RupeeLoadingAnimation />}
       </AnimatePresence>
 
-      <div className="dark min-h-screen flex flex-col" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      <div className="dark min-h-screen flex flex-col relative" style={{ background: 'hsl(222, 47%, 6%)' }}>
+        <ScootyBackground />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-6 py-4 relative z-10">
           <div className="flex items-center gap-2">
-            <img src={incomeshieldLogo} alt="IncomeShield" className="h-8 w-8" />
-            <span className="text-lg font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>IncomeShield</span>
+            <img src={incomeshieldLogo} alt="IncomeShield" className="h-8 w-8 invert" />
+            <div>
+              <span className="text-lg font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>{t('appName')}</span>
+              <p className="text-[9px]" style={{ color: 'hsl(220, 9%, 55%)' }}>{t('tagline')}</p>
+            </div>
           </div>
           <LanguageSelector compact />
         </div>
 
-        <div className="flex-1 flex flex-col items-center px-4 py-8">
+        <div className="flex-1 flex flex-col items-center px-4 py-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
             <h1 className="text-3xl font-extrabold tracking-tight mb-2" style={{ color: 'hsl(220, 20%, 93%)' }}>
-              Choose Your Shield
+              {t('choosePlan')}
             </h1>
             <p className="text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>
               Affordable plans designed for delivery partners
@@ -107,7 +115,7 @@ export default function SubscriptionPage() {
               }`}
               style={billing !== 'weekly' ? { color: 'hsl(220, 9%, 55%)' } : {}}
             >
-              Weekly
+              {t('weeklyBilling')}
             </button>
             <button
               onClick={() => setBilling('monthly')}
@@ -116,7 +124,7 @@ export default function SubscriptionPage() {
               }`}
               style={billing !== 'monthly' ? { color: 'hsl(220, 9%, 55%)' } : {}}
             >
-              Monthly <span className="text-xs opacity-70">Save 15%</span>
+              {t('monthlyBilling')} <span className="text-xs opacity-70">Save 15%</span>
             </button>
           </div>
 
@@ -124,7 +132,7 @@ export default function SubscriptionPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full">
             {plans.map((plan, i) => (
               <motion.div
-                key={plan.name}
+                key={plan.nameKey}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
@@ -138,19 +146,19 @@ export default function SubscriptionPage() {
               >
                 {plan.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
-                    Most Popular
+                    {t('popular')}
                   </span>
                 )}
                 <div className="flex items-center gap-2 mb-4">
                   <plan.icon className="h-5 w-5" style={{ color: 'hsl(168, 64%, 42%)' }} />
-                  <h3 className="font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>{plan.name}</h3>
+                  <h3 className="font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>{t(plan.nameKey)}</h3>
                 </div>
                 <div className="mb-4">
                   <span className="text-3xl font-extrabold" style={{ color: 'hsl(220, 20%, 93%)' }}>
                     ₹{billing === 'weekly' ? plan.weeklyPrice : plan.monthlyPrice}
                   </span>
                   <span className="text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>
-                    /{billing === 'weekly' ? 'week' : 'month'}
+                    /{billing === 'weekly' ? t('weeklyBilling').toLowerCase() : t('monthlyBilling').toLowerCase()}
                   </span>
                 </div>
                 <ul className="space-y-2 flex-1 mb-6">
@@ -182,7 +190,7 @@ export default function SubscriptionPage() {
             className="mt-8 flex items-center gap-2 text-sm font-medium transition-all hover:gap-3 btn-3d px-6 py-3 rounded-full"
             style={{ color: 'hsl(220, 9%, 60%)', background: 'hsl(222, 47%, 11%)', border: '1px solid hsl(222, 30%, 18%)' }}
           >
-            Continue for Free (15 days only) <ArrowRight className="h-4 w-4" />
+            {t('continueForFree')} <ArrowRight className="h-4 w-4" />
           </motion.button>
         </div>
       </div>

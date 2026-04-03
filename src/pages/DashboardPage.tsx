@@ -15,19 +15,11 @@ import { toast } from 'sonner';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import LanguageSelector from '@/components/LanguageSelector';
-
-const DISRUPTION_TYPES = [
-  'Heavy Rainfall / Flooding',
-  'Heatwave (>45°C)',
-  'Severe Air Pollution (AQI >300)',
-  'Cyclone / Storm',
-  'Road Blockage / Waterlogging',
-  'Platform Server Downtime',
-  'Accident / Vehicle Breakdown',
-];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const geo = useGeolocation();
   const detectedCity = geo.city || user?.city || 'Mumbai';
   const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
@@ -37,14 +29,24 @@ export default function DashboardPage() {
   const [showSimForm, setShowSimForm] = useState(false);
   const [simDisruption, setSimDisruption] = useState('');
 
+  const DISRUPTION_TYPES = [
+    t('heavyRainfall'),
+    t('heatwave'),
+    t('severeAirPollution'),
+    t('cycloneStorm'),
+    t('roadBlockage'),
+    t('platformDowntime'),
+    t('accidentBreakdown'),
+  ];
+
   const totalSimulatedPayout = simulatedClaims.reduce((s, c) => s + c.amount, 0);
 
   const handleSimulateSubmit = useCallback(() => {
     setShowSimForm(false);
     setTriggerActive(true);
     setSimulationCount(prev => prev + 1);
-    toast.warning(`⚠️ ${simDisruption || 'Weather Disruption'} Detected — Trigger Activated!`, {
-      description: `Location: ${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`,
+    toast.warning(`⚠️ ${simDisruption || 'Weather Disruption'} — ${t('triggerActivated')}!`, {
+      description: `${t('locationGps')}: ${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`,
     });
 
     setTimeout(() => {
@@ -52,9 +54,9 @@ export default function DashboardPage() {
       const hours = 3 + Math.floor(Math.random() * 3);
       const txnId = 'TXN_RPY_' + Math.random().toString(36).slice(2, 9).toUpperCase();
       setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId }]);
-      toast.success(`✅ Payout of ${formatCurrency(payout)} credited!`, { description: `Transaction: ${txnId}` });
+      toast.success(`✅ ${t('payoutProcessed')}: ${formatCurrency(payout)} ${t('credited')}!`, { description: `Transaction: ${txnId}` });
     }, 2500);
-  }, [simDisruption, geo.locality, detectedCity]);
+  }, [simDisruption, geo.locality, detectedCity, t]);
 
   const resetSimulation = useCallback(() => {
     setTriggerActive(false);
@@ -71,38 +73,36 @@ export default function DashboardPage() {
     <div className="space-y-4 lg:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground">Hi, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground">{t('hi')}, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             {geo.loading ? (
               <span className="text-sm text-muted-foreground flex items-center gap-1">
-                <Loader2 className="h-3 w-3 animate-spin" /> Detecting location…
+                <Loader2 className="h-3 w-3 animate-spin" /> {t('detectingLocation')}
               </span>
             ) : geo.error ? (
-              <span className="text-sm text-warning">
-                Location access denied — using profile city ({user?.city || 'Mumbai'})
-              </span>
+              <span className="text-sm text-warning">{t('locationDenied')}</span>
             ) : (
               <span className="text-sm text-foreground font-medium">
                 {geo.locality ? `${geo.locality}, ` : ''}{geo.city || detectedCity}
               </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">Your coverage snapshot this week</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t('coverageSnapshot')}</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {simulationCount > 0 && (
-            <span className="text-xs text-muted-foreground">Simulated: {simulationCount}x</span>
+            <span className="text-xs text-muted-foreground">{t('simulated')}: {simulationCount}x</span>
           )}
           <Button onClick={() => refetchWeather()} variant="outline" size="sm" className="gap-2 btn-3d" disabled={weatherLoading}>
             {weatherLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            Refresh Weather
+            {t('refreshWeather')}
           </Button>
           <Button onClick={() => setShowSimForm(true)} variant="destructive" size="sm" className="gap-2 w-full sm:w-auto btn-3d">
-            <CloudRain className="h-4 w-4" /> Simulate Disruption
+            <CloudRain className="h-4 w-4" /> {t('simulateDisruption')}
           </Button>
           {simulationCount > 0 && (
             <Button onClick={resetSimulation} variant="outline" size="sm" className="gap-2 w-full sm:w-auto btn-3d">
-              Reset
+              {t('reset')}
             </Button>
           )}
         </div>
@@ -113,28 +113,28 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setShowSimForm(false)}>
           <div className="bg-card rounded-2xl p-6 w-full max-w-md mx-4 space-y-4 border border-border" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-foreground">Simulate Disruption</h3>
+              <h3 className="text-lg font-bold text-foreground">{t('simulateDisruption')}</h3>
               <button onClick={() => setShowSimForm(false)} className="p-1 rounded-lg hover:bg-muted btn-3d">
                 <X className="h-5 w-5 text-muted-foreground" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <Label className="text-xs text-muted-foreground">Name</Label>
+                <Label className="text-xs text-muted-foreground">{t('name')}</Label>
                 <Input value={user?.name || ''} disabled className="bg-muted/50" />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Location (GPS)</Label>
+                <Label className="text-xs text-muted-foreground">{t('locationGps')}</Label>
                 <Input value={`${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`} disabled className="bg-muted/50" />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Current Weather</Label>
-                <Input value={weatherData ? `${weatherData.conditions.description}, ${weatherData.monitors.temperature.value}` : 'Loading...'} disabled className="bg-muted/50" />
+                <Label className="text-xs text-muted-foreground">{t('currentWeather')}</Label>
+                <Input value={weatherData ? `${weatherData.conditions.description}, ${weatherData.monitors.temperature.value}` : t('loading')} disabled className="bg-muted/50" />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">Type of Disruption</Label>
+                <Label className="text-xs text-muted-foreground">{t('typeOfDisruption')}</Label>
                 <Select value={simDisruption} onValueChange={setSimDisruption}>
-                  <SelectTrigger><SelectValue placeholder="Select disruption type" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t('selectDisruptionType')} /></SelectTrigger>
                   <SelectContent>
                     {DISRUPTION_TYPES.map(d => (
                       <SelectItem key={d} value={d}>{d}</SelectItem>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <Button onClick={handleSimulateSubmit} className="w-full btn-3d" disabled={!simDisruption}>
-              Submit Claim
+              {t('submitClaim')}
             </Button>
           </div>
         </div>
@@ -158,13 +158,13 @@ export default function DashboardPage() {
         <div className="p-3 lg:p-4 rounded-xl bg-danger/10 border border-danger/20 flex items-center gap-3 animate-slide-in">
           <AlertTriangle className="h-5 w-5 text-danger animate-pulse-glow shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-danger text-sm">Trigger Activated</p>
-            <p className="text-xs text-danger/80">{simDisruption || 'Disruption'} detected. Auto-claim initiated.</p>
+            <p className="font-semibold text-danger text-sm">{t('triggerActivated')}</p>
+            <p className="text-xs text-danger/80">{simDisruption || 'Disruption'} {t('autoClaimInitiated')}</p>
           </div>
           {latestClaim && (
             <div className="text-right shrink-0">
               <p className="text-base font-bold text-safe">{formatCurrency(latestClaim.amount)}</p>
-              <p className="text-[10px] text-muted-foreground">Credited</p>
+              <p className="text-[10px] text-muted-foreground">{t('credited')}</p>
             </div>
           )}
         </div>
@@ -177,26 +177,26 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-safe" />
               <h3 className="font-semibold text-foreground text-sm">
-                {simulatedClaims.length} Payout{simulatedClaims.length > 1 ? 's' : ''} Processed
+                {simulatedClaims.length} {t('payoutProcessed')}
               </h3>
             </div>
             <p className="text-base font-bold text-safe">{formatCurrency(totalSimulatedPayout)}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] text-muted-foreground">Latest Amount</p>
+              <p className="text-[10px] text-muted-foreground">{t('amount')}</p>
               <p className="text-base font-bold text-foreground">{formatCurrency(latestClaim!.amount)}</p>
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground">Hours Covered</p>
+              <p className="text-[10px] text-muted-foreground">{t('hoursCovered')}</p>
               <p className="text-base font-bold text-foreground">{latestClaim!.hours} hrs</p>
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground">Transaction</p>
+              <p className="text-[10px] text-muted-foreground">{t('transactionId')}</p>
               <p className="text-xs font-mono text-foreground break-all">{latestClaim!.txnId}</p>
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground">Status</p>
+              <p className="text-[10px] text-muted-foreground">{t('status')}</p>
               <StatusBadge status="paid" />
             </div>
           </div>
@@ -205,15 +205,15 @@ export default function DashboardPage() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard title="Premium" value={formatCurrency(mockPolicy.totalPremium)} subtitle="Weekly" icon={Shield} variant="default" />
-        <StatCard title="Coverage" value={formatCurrency(mockPolicy.coverageAmount)} subtitle="Max payout" icon={TrendingUp} variant="accent" />
-        <StatCard title="Protected" value={formatCurrency(currentEarningsProtected)} subtitle="This week" icon={Zap} variant="safe" />
-        <StatCard title="Last Payout" value={formatCurrency(currentLastPayout)} subtitle={currentLastPayoutTime} icon={CheckCircle} variant="safe" />
+        <StatCard title={t('premium')} value={formatCurrency(mockPolicy.totalPremium)} subtitle={t('weekly')} icon={Shield} variant="default" />
+        <StatCard title={t('coverage')} value={formatCurrency(mockPolicy.coverageAmount)} subtitle={t('maxPayout')} icon={TrendingUp} variant="accent" />
+        <StatCard title={t('protected')} value={formatCurrency(currentEarningsProtected)} subtitle={t('thisWeek')} icon={Zap} variant="safe" />
+        <StatCard title={t('lastPayout')} value={formatCurrency(currentLastPayout)} subtitle={currentLastPayoutTime} icon={CheckCircle} variant="safe" />
       </div>
 
       {/* Risk Score */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
-        <h3 className="text-sm font-semibold text-foreground mb-4">AI Risk Score</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4">{t('aiRiskScore')}</h3>
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <RiskGauge score={Math.min(mockRiskScore.overall + simulationCount * 5, 99)} />
           <div className="flex-1">
@@ -225,7 +225,7 @@ export default function DashboardPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="elevated-card rounded-xl p-4 lg:p-6">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Earnings Protected</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">{t('earningsProtected')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={weeklyEarningsData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -239,7 +239,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="elevated-card rounded-xl p-4 lg:p-6">
-          <h3 className="text-sm font-semibold text-foreground mb-3">Risk Trend (7 Days)</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-3">{t('riskTrend')}</h3>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={riskTrendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -255,7 +255,7 @@ export default function DashboardPage() {
       {/* Environmental Monitors */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-foreground">Live Monitors</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('liveMonitors')}</h3>
           {weatherData && (
             <div className="flex items-center gap-2">
               {weatherData.conditions.icon && (
@@ -274,7 +274,7 @@ export default function DashboardPage() {
         )}
         <div className="grid grid-cols-2 gap-3">
           <MonitorCard
-            label="Rainfall"
+            label={t('rainfall')}
             value={triggerActive ? '65 mm/hr' : (weatherData?.monitors.rainfall.value || '— mm/hr')}
             status={triggerActive ? 'danger' : (weatherData?.monitors.rainfall.status || 'safe')}
             icon="🌧️"
@@ -282,7 +282,7 @@ export default function DashboardPage() {
             subtitle={weatherData ? `Humidity: ${weatherData.conditions.humidity}%` : undefined}
           />
           <MonitorCard
-            label="Temp"
+            label={t('temp')}
             value={weatherData?.monitors.temperature.value || '—°C'}
             status={weatherData?.monitors.temperature.status || 'safe'}
             icon="🌡️"
@@ -290,7 +290,7 @@ export default function DashboardPage() {
             subtitle={weatherData ? `Feels like: ${weatherData.monitors.temperature.feelsLike}°C` : undefined}
           />
           <MonitorCard
-            label="AQI"
+            label={t('aqi')}
             value={weatherData?.monitors.aqi.value || '—'}
             status={weatherData?.monitors.aqi.status || 'safe'}
             icon="🏭"
@@ -298,7 +298,7 @@ export default function DashboardPage() {
             subtitle={weatherData ? `PM2.5: ${weatherData.monitors.aqi.pm25}` : undefined}
           />
           <MonitorCard
-            label="Wind"
+            label={t('wind')}
             value={weatherData ? `${weatherData.conditions.windSpeed} km/h` : '— km/h'}
             status={weatherData && weatherData.conditions.windSpeed > 50 ? 'danger' : weatherData && weatherData.conditions.windSpeed > 30 ? 'warning' : 'safe'}
             icon="💨"
@@ -315,10 +315,10 @@ export default function DashboardPage() {
       {/* Savings callout */}
       <div className="rounded-xl p-4 bg-accent/10 border border-accent/20">
         <p className="text-sm lg:text-base font-semibold text-foreground">
-          💰 You saved {formatCurrency(currentEarningsProtected)} this week
+          💰 {t('savedThisWeek', { amount: formatCurrency(currentEarningsProtected) })}
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          {2 + simulationCount} disruption events detected — payouts processed instantly.
+          {t('disruptionEvents', { count: 2 + simulationCount })}
         </p>
       </div>
     </div>
