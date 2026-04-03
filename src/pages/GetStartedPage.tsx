@@ -41,7 +41,8 @@ export default function GetStartedPage() {
         {showLoader && <RupeeLoadingAnimation />}
       </AnimatePresence>
 
-      <div className="dark min-h-screen flex flex-col overflow-hidden" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      <div className="dark min-h-screen flex flex-col overflow-hidden relative" style={{ background: 'hsl(222, 47%, 6%)' }}>
+        <ScootyBackground />
         {/* Language selector top-right */}
         <div className="absolute top-4 right-4 z-20">
           <LanguageSelector compact />
