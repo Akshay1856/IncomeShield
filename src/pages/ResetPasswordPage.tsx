@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslation } from '@/hooks/useTranslation';
+import ScootyBackground from '@/components/ScootyBackground';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
