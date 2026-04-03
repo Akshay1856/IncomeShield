@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Shield, Users, ArrowRight } from 'lucide-react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
+import ScootyBackground from '@/components/ScootyBackground';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function RoleSelectPage() {
