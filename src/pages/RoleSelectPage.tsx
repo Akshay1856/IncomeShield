@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Shield, Users, ArrowRight } from 'lucide-react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
+import ScootyBackground from '@/components/ScootyBackground';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function RoleSelectPage() {
@@ -10,7 +11,8 @@ export default function RoleSelectPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12" style={{ background: 'hsl(222, 47%, 6%)' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      <ScootyBackground />
       <div className="absolute top-4 right-4 z-20">
         <LanguageSelector compact />
       </div>

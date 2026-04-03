@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslation } from '@/hooks/useTranslation';
+import ScootyBackground from '@/components/ScootyBackground';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -57,7 +58,8 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12" style={{ background: 'hsl(222, 47%, 6%)' }}>
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 relative" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      <ScootyBackground />
       <div className="absolute top-4 right-4 z-20">
         <LanguageSelector compact />
       </div>
