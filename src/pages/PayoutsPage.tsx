@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/DashboardWidgets';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { CreditCard, Clock, TrendingUp, Landmark, Smartphone, Wallet, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const payoutTrendData = [
   { week: 'Week 1', amount: 500, label: 'W1' },
@@ -42,19 +43,19 @@ const faqs = [
 
 export default function PayoutsPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl lg:text-2xl font-bold text-foreground">Payouts & Transactions</h1>
-        <p className="text-sm text-muted-foreground">Track all your insurance payouts and settlements</p>
+        <h1 className="text-xl lg:text-2xl font-bold text-foreground">{t('payoutsTransactions')}</h1>
+        <p className="text-sm text-muted-foreground">{t('trackPayouts')}</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-xl p-5 border-2 border-safe/30 bg-safe/5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total Payouts</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('totalPayouts')}</p>
             <CreditCard className="h-5 w-5 text-safe" />
           </div>
           <p className="text-3xl font-bold text-foreground">{formatCurrency(totalPayout)}</p>
@@ -62,7 +63,7 @@ export default function PayoutsPage() {
         </div>
         <div className="rounded-xl p-5 border-2 border-primary/20 bg-primary/5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pending Payouts</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('pendingPayouts')}</p>
             <Clock className="h-5 w-5 text-primary" />
           </div>
           <p className="text-3xl font-bold text-foreground">₹0</p>
@@ -70,18 +71,17 @@ export default function PayoutsPage() {
         </div>
         <div className="rounded-xl p-5 border-2 border-accent/30 bg-accent/5">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Avg Payout</p>
-            <span className="text-xs font-semibold text-accent-foreground bg-accent px-2 py-0.5 rounded-full">Monthly</span>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('avgPayoutLabel')}</p>
+            <span className="text-xs font-semibold text-accent-foreground bg-accent px-2 py-0.5 rounded-full">{t('monthlyBilling')}</span>
           </div>
           <p className="text-3xl font-bold text-foreground">{formatCurrency(Math.round(avgPayout))}</p>
           <p className="text-xs text-accent mt-1">Per transaction</p>
         </div>
       </div>
 
-      {/* Payout Trend Chart */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-foreground">Payout Trend (5 Weeks)</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('payoutTrend')}</h3>
           <span className="text-xs text-muted-foreground">
             Highest: <span className="font-bold text-safe">{highestWeek.week}</span> — {formatCurrency(highestWeek.amount)}
           </span>
@@ -101,21 +101,20 @@ export default function PayoutsPage() {
         </ResponsiveContainer>
       </div>
 
-      {/* Recent Payouts Table */}
       <div className="elevated-card rounded-xl overflow-hidden">
         <div className="p-4 border-b border-border">
-          <h3 className="text-sm font-semibold text-foreground">Recent Payouts</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('recentPayouts')}</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/50">
-                <th className="text-left text-xs font-semibold text-muted-foreground p-3">Transaction ID</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground p-3">Claim ID</th>
-                <th className="text-right text-xs font-semibold text-muted-foreground p-3">Amount</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground p-3">Status</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground p-3">Date</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground p-3">Action</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-3">{t('transactionId')}</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-3">{t('claimId')}</th>
+                <th className="text-right text-xs font-semibold text-muted-foreground p-3">{t('amount')}</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-3">{t('status')}</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-3">{t('date')}</th>
+                <th className="text-left text-xs font-semibold text-muted-foreground p-3">{t('action')}</th>
               </tr>
             </thead>
             <tbody>
@@ -138,9 +137,8 @@ export default function PayoutsPage() {
         </div>
       </div>
 
-      {/* Payment Methods */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Payment Methods</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4">{t('paymentMethods')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {paymentMethods.map(m => (
             <div key={m.name} className={`p-4 rounded-xl border ${m.active ? 'border-safe/30 bg-safe/5' : 'border-border bg-muted/30'} flex items-center gap-3`}>
@@ -157,9 +155,8 @@ export default function PayoutsPage() {
         </div>
       </div>
 
-      {/* FAQs */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
-        <h3 className="text-sm font-semibold text-foreground mb-4">Frequently Asked Questions</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4">{t('faq')}</h3>
         <div className="space-y-2">
           {faqs.map((faq, i) => (
             <div key={i} className="border border-border rounded-lg overflow-hidden">
