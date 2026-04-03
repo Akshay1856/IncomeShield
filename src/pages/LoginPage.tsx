@@ -125,7 +125,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <ScootyBackground />
       {/* Left panel - branding (dark readable theme) */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 relative overflow-hidden" style={{ background: 'hsl(222, 47%, 8%)' }}>
         <div className="absolute inset-0 opacity-10">

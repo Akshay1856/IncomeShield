@@ -34,7 +34,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12" style={{ background: 'hsl(222, 47%, 6%)' }}>
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 relative" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      <ScootyBackground />
       <div className="absolute top-4 right-4 z-20">
         <LanguageSelector compact />
       </div>
