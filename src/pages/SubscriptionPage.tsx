@@ -60,6 +60,7 @@ export default function SubscriptionPage() {
   const { t } = useTranslation();
   const [billing, setBilling] = useState<'weekly' | 'monthly'>('monthly');
   const [showLoader, setShowLoader] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>('proShield');
 
   const handleSelectPlan = () => {
     setShowLoader(true);
