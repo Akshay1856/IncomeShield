@@ -5,7 +5,7 @@ export default function ScootyBackground() {
     <div
       className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center"
       style={{
-        opacity: 0.10,
+        opacity: 0.04,
       }}
     >
       <img
