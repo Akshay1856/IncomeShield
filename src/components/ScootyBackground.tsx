@@ -14,8 +14,8 @@ export default function ScootyBackground() {
         className="w-full h-full object-contain"
         style={{
           filter: 'brightness(0) invert(1)',
-          maxWidth: '90vw',
-          maxHeight: '90vh',
+          maxWidth: '60vw',
+          maxHeight: '60vh',
         }}
       />
     </div>
