@@ -152,7 +152,7 @@ We chose a **web-based platform** for Phase 1 because:
 
 To build a scalable, AI-driven safety net that protects gig workers from unpredictable income disruptions, ensuring financial stability in India’s rapidly growing gig economy.
 
-## **👨‍💻 Team Mambo**
+## **👨‍💻 Team Sn3kBy7e*
 Building the future of **gig economy insurance** 🚀
 
 **Team Members:**
