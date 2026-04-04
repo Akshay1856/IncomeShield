@@ -60,6 +60,7 @@ export default function SubscriptionPage() {
   const { t } = useTranslation();
   const [billing, setBilling] = useState<'weekly' | 'monthly'>('monthly');
   const [showLoader, setShowLoader] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string>('proShield');
 
   const handleSelectPlan = () => {
     setShowLoader(true);
@@ -130,54 +131,58 @@ export default function SubscriptionPage() {
 
           {/* Plans */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full">
-            {plans.map((plan, i) => (
-              <motion.div
-                key={plan.nameKey}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={`relative rounded-2xl p-6 flex flex-col btn-3d ${
-                  plan.popular ? 'ring-2 ring-primary' : ''
-                }`}
-                style={{
-                  background: 'hsl(222, 47%, 11%)',
-                  border: `1px solid ${plan.popular ? 'hsl(230, 65%, 40%)' : 'hsl(222, 30%, 18%)'}`,
-                }}
-              >
-                {plan.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
-                    {t('popular')}
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mb-4">
-                  <plan.icon className="h-5 w-5" style={{ color: 'hsl(168, 64%, 42%)' }} />
-                  <h3 className="font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>{t(plan.nameKey)}</h3>
-                </div>
-                <div className="mb-4">
-                  <span className="text-3xl font-extrabold" style={{ color: 'hsl(220, 20%, 93%)' }}>
-                    ₹{billing === 'weekly' ? plan.weeklyPrice : plan.monthlyPrice}
-                  </span>
-                  <span className="text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>
-                    /{billing === 'weekly' ? t('weeklyBilling').toLowerCase() : t('monthlyBilling').toLowerCase()}
-                  </span>
-                </div>
-                <ul className="space-y-2 flex-1 mb-6">
-                  {plan.features.map(f => (
-                    <li key={f} className="flex items-start gap-2 text-sm" style={{ color: 'hsl(220, 9%, 65%)' }}>
-                      <Check className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'hsl(152, 69%, 41%)' }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  onClick={handleSelectPlan}
-                  className={`w-full btn-3d ${plan.popular ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}
-                  disabled={showLoader}
+            {plans.map((plan, i) => {
+              const isSelected = selectedPlan === plan.nameKey;
+              return (
+                <motion.div
+                  key={plan.nameKey}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  onClick={() => setSelectedPlan(plan.nameKey)}
+                  className={`relative rounded-2xl p-6 flex flex-col btn-3d cursor-pointer transition-all duration-200 ${
+                    isSelected ? 'ring-2 ring-primary' : ''
+                  }`}
+                  style={{
+                    background: 'hsl(222, 47%, 11%)',
+                    border: `1px solid ${isSelected ? 'hsl(230, 65%, 40%)' : 'hsl(222, 30%, 18%)'}`,
+                  }}
                 >
-                  Select Plan
-                </Button>
-              </motion.div>
-            ))}
+                  {plan.popular && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-primary text-primary-foreground">
+                      {t('popular')}
+                    </span>
+                  )}
+                  <div className="flex items-center gap-2 mb-4">
+                    <plan.icon className="h-5 w-5" style={{ color: 'hsl(168, 64%, 42%)' }} />
+                    <h3 className="font-bold" style={{ color: 'hsl(220, 20%, 93%)' }}>{t(plan.nameKey)}</h3>
+                  </div>
+                  <div className="mb-4">
+                    <span className="text-3xl font-extrabold" style={{ color: 'hsl(220, 20%, 93%)' }}>
+                      ₹{billing === 'weekly' ? plan.weeklyPrice : plan.monthlyPrice}
+                    </span>
+                    <span className="text-sm" style={{ color: 'hsl(220, 9%, 55%)' }}>
+                      /{billing === 'weekly' ? t('weeklyBilling').toLowerCase() : t('monthlyBilling').toLowerCase()}
+                    </span>
+                  </div>
+                  <ul className="space-y-2 flex-1 mb-6">
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-start gap-2 text-sm" style={{ color: 'hsl(220, 9%, 65%)' }}>
+                        <Check className="h-4 w-4 mt-0.5 shrink-0" style={{ color: 'hsl(152, 69%, 41%)' }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan.nameKey); handleSelectPlan(); }}
+                    className={`w-full btn-3d ${isSelected ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}
+                    disabled={showLoader}
+                  >
+                    Select Plan
+                  </Button>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* Continue Free */}
