@@ -252,14 +252,10 @@ export default function LoginPage() {
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="end">
-                        <Calendar
-                          mode="single"
+                        <DatePickerDOB
                           selected={dob}
                           onSelect={handleCalendarSelect}
                           disabled={(date) => date > new Date() || date < new Date('1940-01-01')}
-                          initialFocus
-                          className={cn('p-3 pointer-events-auto')}
-                          defaultMonth={dob || new Date(2000, 0)}
                         />
                       </PopoverContent>
                     </Popover>
