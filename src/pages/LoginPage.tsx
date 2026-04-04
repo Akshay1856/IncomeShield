@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
+import { DatePickerDOB } from '@/components/DatePickerDOB';
 import { CloudRain, Thermometer, Zap, Eye, EyeOff, CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, parse, differenceInYears, isValid } from 'date-fns';
@@ -252,14 +252,10 @@ export default function LoginPage() {
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="end">
-                        <Calendar
-                          mode="single"
+                        <DatePickerDOB
                           selected={dob}
                           onSelect={handleCalendarSelect}
                           disabled={(date) => date > new Date() || date < new Date('1940-01-01')}
-                          initialFocus
-                          className={cn('p-3 pointer-events-auto')}
-                          defaultMonth={dob || new Date(2000, 0)}
                         />
                       </PopoverContent>
                     </Popover>
