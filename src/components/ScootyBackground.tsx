@@ -5,7 +5,7 @@ export default function ScootyBackground() {
     <div
       className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center"
       style={{
-        opacity: 0.10,
+        opacity: 0.04,
       }}
     >
       <img
@@ -14,8 +14,8 @@ export default function ScootyBackground() {
         className="w-full h-full object-contain"
         style={{
           filter: 'brightness(0) invert(1)',
-          maxWidth: '90vw',
-          maxHeight: '90vh',
+          maxWidth: '60vw',
+          maxHeight: '60vh',
         }}
       />
     </div>
