@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          avatar_url: string | null
           city: string
           created_at: string
           id: string
@@ -27,6 +28,7 @@ export type Database = {
           work_type: string
         }
         Insert: {
+          avatar_url?: string | null
           city?: string
           created_at?: string
           id?: string
@@ -38,6 +40,7 @@ export type Database = {
           work_type?: string
         }
         Update: {
+          avatar_url?: string | null
           city?: string
           created_at?: string
           id?: string
