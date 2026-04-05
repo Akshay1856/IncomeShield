@@ -347,6 +347,10 @@ export default function LoginPage() {
               {isSignup ? 'Sign in' : 'Sign up'}
             </button>
           </p>
+          <div className="flex justify-center gap-4 pt-3 text-xs text-muted-foreground">
+            <a href="/privacy-policy" className="hover:underline hover:text-primary">Privacy Policy</a>
+            <a href="/terms-of-service" className="hover:underline hover:text-primary">Terms of Service</a>
+          </div>
         </div>
       </div>
     </div>

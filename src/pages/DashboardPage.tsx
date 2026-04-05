@@ -24,19 +24,20 @@ export default function DashboardPage() {
   const detectedCity = geo.city || user?.city || 'Mumbai';
   const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
   const [triggerActive, setTriggerActive] = useState(false);
-  const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string }>>([]);
+  const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string; claimId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
   const [showSimForm, setShowSimForm] = useState(false);
   const [simDisruption, setSimDisruption] = useState('');
 
+  // Disruption types with claim IDs from transparency/mockClaims
   const DISRUPTION_TYPES = [
-    t('heavyRainfall'),
-    t('heatwave'),
-    t('severeAirPollution'),
-    t('cycloneStorm'),
-    t('roadBlockage'),
-    t('platformDowntime'),
-    t('accidentBreakdown'),
+    { label: `${t('heavyRainfall')} (CLM-001)`, value: 'rainfall' },
+    { label: `${t('heatwave')} (CLM-002)`, value: 'heatwave' },
+    { label: `Severe Air Pollution (CLM-003)`, value: 'aqi' },
+    { label: `${t('platformDowntime')} (CLM-004)`, value: 'platform_downtime' },
+    { label: `${t('heavyRainfall')} — Waterlogging (CLM-005)`, value: 'rainfall_flood' },
+    { label: `Extreme Heat Advisory (CLM-006)`, value: 'heatwave_extreme' },
+    { label: `Poor AQI (CLM-007)`, value: 'aqi_moderate' },
   ];
 
   const totalSimulatedPayout = simulatedClaims.reduce((s, c) => s + c.amount, 0);
@@ -45,7 +46,8 @@ export default function DashboardPage() {
     setShowSimForm(false);
     setTriggerActive(true);
     setSimulationCount(prev => prev + 1);
-    toast.warning(`⚠️ ${simDisruption || 'Weather Disruption'} — ${t('triggerActivated')}!`, {
+    const selectedType = DISRUPTION_TYPES.find(d => d.value === simDisruption);
+    toast.warning(`⚠️ ${selectedType?.label || 'Weather Disruption'} — ${t('triggerActivated')}!`, {
       description: `${t('locationGps')}: ${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`,
     });
 
@@ -53,10 +55,11 @@ export default function DashboardPage() {
       const payout = 400 + Math.floor(Math.random() * 200);
       const hours = 3 + Math.floor(Math.random() * 3);
       const txnId = 'TXN_RPY_' + Math.random().toString(36).slice(2, 9).toUpperCase();
-      setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId }]);
+      const claimId = `CLM-${String(mockClaims.length + simulationCount + 1).padStart(3, '0')}`;
+      setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId, claimId }]);
       toast.success(`✅ ${t('payoutProcessed')}: ${formatCurrency(payout)} ${t('credited')}!`, { description: `Transaction: ${txnId}` });
     }, 2500);
-  }, [simDisruption, geo.locality, detectedCity, t]);
+  }, [simDisruption, geo.locality, detectedCity, t, simulationCount]);
 
   const resetSimulation = useCallback(() => {
     setTriggerActive(false);
@@ -68,6 +71,7 @@ export default function DashboardPage() {
   const currentEarningsProtected = mockPolicy.earningsProtected + totalSimulatedPayout;
   const currentLastPayout = latestClaim ? latestClaim.amount : mockClaims[0].payoutAmount;
   const currentLastPayoutTime = latestClaim ? 'Just now' : formatDateTime(mockClaims[0].timestamp);
+  const currentRiskScore = Math.min(mockRiskScore.overall + simulationCount * 5, 99);
 
   return (
     <div className="space-y-4 lg:space-y-6">
@@ -128,7 +132,7 @@ export default function DashboardPage() {
                 <Input value={`${geo.locality ? `${geo.locality}, ` : ''}${detectedCity}`} disabled className="bg-muted/50" />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground">{t('currentWeather')}</Label>
+                <Label className="text-xs text-muted-foreground">Current Weather</Label>
                 <Input value={weatherData ? `${weatherData.conditions.description}, ${weatherData.monitors.temperature.value}` : t('loading')} disabled className="bg-muted/50" />
               </div>
               <div>
@@ -137,7 +141,7 @@ export default function DashboardPage() {
                   <SelectTrigger><SelectValue placeholder={t('selectDisruptionType')} /></SelectTrigger>
                   <SelectContent>
                     {DISRUPTION_TYPES.map(d => (
-                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                      <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -159,7 +163,7 @@ export default function DashboardPage() {
           <AlertTriangle className="h-5 w-5 text-danger animate-pulse-glow shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-danger text-sm">{t('triggerActivated')}</p>
-            <p className="text-xs text-danger/80">{simDisruption || 'Disruption'} {t('autoClaimInitiated')}</p>
+            <p className="text-xs text-danger/80">{DISRUPTION_TYPES.find(d => d.value === simDisruption)?.label || 'Disruption'} {t('autoClaimInitiated')}</p>
           </div>
           {latestClaim && (
             <div className="text-right shrink-0">
@@ -215,7 +219,7 @@ export default function DashboardPage() {
       <div className="elevated-card rounded-xl p-4 lg:p-6">
         <h3 className="text-sm font-semibold text-foreground mb-4">{t('aiRiskScore')}</h3>
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <RiskGauge score={Math.min(mockRiskScore.overall + simulationCount * 5, 99)} />
+          <RiskGauge score={currentRiskScore} />
           <div className="flex-1">
             <RiskExplanation riskScore={mockRiskScore} />
           </div>

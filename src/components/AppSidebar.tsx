@@ -15,6 +15,7 @@ import {
   CreditCard,
   PanelLeftClose,
   PanelLeft,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
@@ -35,6 +36,7 @@ export default function AppSidebar() {
     { to: '/subscription', label: t('subscription'), icon: CreditCard },
     { to: '/triggers', label: t('triggers'), icon: AlertTriangle },
     { to: '/transparency', label: t('transparency'), icon: Eye },
+    { to: '/profile', label: t('profile') || 'Profile', icon: User },
     { to: '/admin', label: t('admin'), icon: BarChart3 },
   ];
 
@@ -55,7 +57,6 @@ export default function AppSidebar() {
               <p className="text-[10px]" style={{ color: 'hsl(220, 20%, 60%)' }}>{t('tagline')}</p>
             </div>
           )}
-          {/* Collapse toggle next to name */}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="p-1.5 rounded-lg transition-colors hover:bg-white/10 shrink-0"
@@ -99,16 +100,15 @@ export default function AppSidebar() {
                 <p className="text-xs truncate" style={{ color: 'hsl(220, 20%, 60%)' }}>{user?.city || ''}</p>
               </div>
             )}
+            <button
+              onClick={logout}
+              title={t('signOut')}
+              className="p-1.5 rounded-lg transition-colors hover:bg-white/10 shrink-0"
+              style={{ color: 'hsl(220, 20%, 60%)' }}
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
-          <button
-            onClick={logout}
-            title={t('signOut')}
-            className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-colors btn-3d ${collapsed ? 'justify-center' : ''}`}
-            style={{ color: 'hsl(220, 20%, 60%)' }}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && t('signOut')}
-          </button>
         </div>
       </aside>
 
@@ -156,14 +156,14 @@ export default function AppSidebar() {
                 <p className="font-medium text-foreground">{user?.name || 'User'}</p>
                 <p className="text-sm text-muted-foreground">{user?.city || ''}</p>
               </div>
+              <button
+                onClick={() => { logout(); setMobileMenuOpen(false); }}
+                className="p-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors btn-3d"
+                title={t('signOut')}
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              onClick={() => { logout(); setMobileMenuOpen(false); }}
-              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base text-destructive hover:bg-destructive/10 transition-colors btn-3d"
-            >
-              <LogOut className="h-5 w-5" />
-              {t('signOut')}
-            </button>
           </div>
         </div>
       )}
