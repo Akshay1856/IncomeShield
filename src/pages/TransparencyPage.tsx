@@ -4,7 +4,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 export default function TransparencyPage() {
   const { t } = useTranslation();
-  const paidClaims = mockClaims.filter(c => c.status === 'paid');
+  const transparencyClaims = mockClaims.filter(c => c.status === 'paid' || c.status === 'approved' || c.status === 'pending');
 
   return (
     <div className="space-y-6">
@@ -15,11 +15,20 @@ export default function TransparencyPage() {
         <p className="text-muted-foreground">{t('completeExplanation')}</p>
       </div>
 
-      {paidClaims.map(claim => (
+      {transparencyClaims.map(claim => (
         <div key={claim.id} className="elevated-card rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-foreground">{triggerTypeLabels[claim.triggerType]} — {claim.id}</h3>
-            <span className="text-lg font-bold text-safe">{formatCurrency(claim.payoutAmount)}</span>
+            <div className="flex items-center gap-3">
+              <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                claim.status === 'paid' ? 'bg-safe/10 text-safe' :
+                claim.status === 'approved' ? 'bg-primary/10 text-primary' :
+                'bg-warning/10 text-warning'
+              }`}>
+                {claim.status.toUpperCase()}
+              </span>
+              <span className="text-lg font-bold text-safe">{formatCurrency(claim.payoutAmount)}</span>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -40,9 +49,9 @@ export default function TransparencyPage() {
           </div>
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-border/50">
-            <span>Transaction: <span className="font-mono">{claim.transactionId}</span></span>
+            <span>Transaction: <span className="font-mono">{claim.transactionId || 'Pending'}</span></span>
             <span>•</span>
-            <span>Processed automatically via smart contract</span>
+            <span>{claim.status === 'paid' ? 'Processed automatically via smart contract' : claim.status === 'approved' ? 'Approved — payout being processed' : 'Pending verification'}</span>
           </div>
         </div>
       ))}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { formatCurrency } from '@/lib/mockData';
+import { mockClaims, formatCurrency } from '@/lib/mockData';
 import { StatusBadge } from '@/components/DashboardWidgets';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { CreditCard, Clock, TrendingUp, Landmark, Smartphone, Wallet, ChevronDown, ChevronUp, Eye } from 'lucide-react';
@@ -16,16 +16,21 @@ const payoutTrendData = [
 
 const highestWeek = payoutTrendData.reduce((max, w) => w.amount > max.amount ? w : max, payoutTrendData[0]);
 
-const recentPayouts = [
-  { txnId: 'TXN_RPY_8847291', claimId: 'CLM-001', amount: 500, status: 'paid', date: '2024-03-14', action: 'View' },
-  { txnId: 'TXN_RPY_8847290', claimId: 'CLM-002', amount: 375, status: 'paid', date: '2024-03-12', action: 'View' },
-  { txnId: 'TXN_RPY_8847289', claimId: 'CLM-003', amount: 625, status: 'approved', date: '2024-03-10', action: 'View' },
-  { txnId: 'TXN_RPY_8847288', claimId: 'CLM-004', amount: 250, status: 'paid', date: '2024-03-08', action: 'View' },
-  { txnId: 'TXN_RPY_8847287', claimId: 'CLM-005', amount: 750, status: 'pending', date: '2024-03-06', action: 'Track' },
-];
+// Build payouts from mockClaims
+const recentPayouts = mockClaims.map(claim => ({
+  txnId: claim.transactionId || `TXN_PENDING_${claim.id}`,
+  claimId: claim.id,
+  amount: claim.payoutAmount,
+  status: claim.status === 'flagged' ? 'flagged' : claim.status,
+  date: claim.timestamp.split('T')[0],
+  action: claim.status === 'paid' ? 'View' : claim.status === 'pending' ? 'Track' : 'View',
+}));
 
-const totalPayout = recentPayouts.filter(p => p.status === 'paid').reduce((s, p) => s + p.amount, 0);
-const avgPayout = totalPayout / recentPayouts.filter(p => p.status === 'paid').length;
+const paidPayouts = recentPayouts.filter(p => p.status === 'paid');
+const pendingPayouts = recentPayouts.filter(p => p.status === 'pending');
+const totalPayout = paidPayouts.reduce((s, p) => s + p.amount, 0);
+const avgPayout = paidPayouts.length > 0 ? totalPayout / paidPayouts.length : 0;
+const pendingTotal = pendingPayouts.reduce((s, p) => s + p.amount, 0);
 
 const paymentMethods = [
   { name: 'Bank Transfer (NEFT/IMPS)', icon: Landmark, desc: 'Direct to your bank account', active: true },
@@ -59,20 +64,20 @@ export default function PayoutsPage() {
             <CreditCard className="h-5 w-5 text-safe" />
           </div>
           <p className="text-3xl font-bold text-foreground">{formatCurrency(totalPayout)}</p>
-          <p className="text-xs text-safe mt-1">{recentPayouts.filter(p => p.status === 'paid').length} successful transactions</p>
+          <p className="text-xs text-safe mt-1">{paidPayouts.length} successful transactions</p>
         </div>
-        <div className="rounded-xl p-5 border-2 border-primary/20 bg-primary/5">
+        <div className="rounded-xl p-5 border-2 border-warning/30 bg-warning/5">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('pendingPayouts')}</p>
-            <Clock className="h-5 w-5 text-primary" />
+            <Clock className="h-5 w-5 text-warning" />
           </div>
-          <p className="text-3xl font-bold text-foreground">₹0</p>
-          <p className="text-xs text-primary mt-1">0 pending</p>
+          <p className="text-3xl font-bold text-foreground">{formatCurrency(pendingTotal)}</p>
+          <p className="text-xs text-warning mt-1">{pendingPayouts.length} pending</p>
         </div>
         <div className="rounded-xl p-5 border-2 border-accent/30 bg-accent/5">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t('avgPayoutLabel')}</p>
-            <span className="text-xs font-semibold text-accent-foreground bg-accent px-2 py-0.5 rounded-full">{t('monthlyBilling')}</span>
+            <TrendingUp className="h-5 w-5 text-accent" />
           </div>
           <p className="text-3xl font-bold text-foreground">{formatCurrency(Math.round(avgPayout))}</p>
           <p className="text-xs text-accent mt-1">Per transaction</p>
@@ -119,7 +124,7 @@ export default function PayoutsPage() {
             </thead>
             <tbody>
               {recentPayouts.map(p => (
-                <tr key={p.txnId} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                <tr key={p.claimId} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="p-3 text-xs font-mono text-foreground">{p.txnId}</td>
                   <td className="p-3 text-xs font-mono text-foreground">{p.claimId}</td>
                   <td className="p-3 text-sm font-bold text-foreground text-right">{formatCurrency(p.amount)}</td>
