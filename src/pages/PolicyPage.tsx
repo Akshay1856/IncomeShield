@@ -1,17 +1,46 @@
 import { useState } from 'react';
-import { mockPolicy, calculatePremium, formatCurrency } from '@/lib/mockData';
+import { mockPolicy, calculatePremium, formatCurrency, cityRiskProfiles } from '@/lib/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatusBadge } from '@/components/DashboardWidgets';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { FileText, Calculator, Shield } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+
+const INDIAN_CITIES = [
+  'Agartala','Agra','Ahmedabad','Ahmednagar','Aizawl','Ajmer','Akola','Aligarh','Allahabad','Ambala',
+  'Amravati','Amritsar','Anand','Anantapur','Aurangabad','Bareilly','Bathinda','Belgaum','Bellary','Bengaluru',
+  'Berhampore','Bhagalpur','Bharatpur','Bharuch','Bhavnagar','Bhilai','Bhilwara','Bhopal','Bhubaneswar','Bikaner',
+  'Bilaspur','Bokaro','Brahmapur','Bulandshahr','Chandigarh','Chennai','Coimbatore','Cuttack','Darbhanga',
+  'Davangere','Dehradun','Delhi','Dhanbad','Dharwad','Dibrugarh','Durg','Durgapur','Erode','Faridabad',
+  'Firozabad','Gangtok','Gaya','Ghaziabad','Gorakhpur','Gulbarga','Guntur','Gurgaon','Guwahati','Gwalior',
+  'Hapur','Hisar','Hospet','Howrah','Hubli','Hyderabad','Imphal','Indore','Itanagar','Jabalpur','Jaipur',
+  'Jalandhar','Jalgaon','Jammu','Jamnagar','Jamshedpur','Jhansi','Jodhpur','Junagadh','Kakinada','Kalyan',
+  'Kanpur','Karimnagar','Karnal','Kochi','Kohima','Kolhapur','Kolkata','Kollam','Kota','Kottayam',
+  'Kozhikode','Kurnool','Latur','Lucknow','Ludhiana','Madurai','Malegaon','Mangalore','Mathura','Meerut',
+  'Moradabad','Mumbai','Muzaffarnagar','Muzaffarpur','Mysore','Nagpur','Nanded','Nashik','Navi Mumbai',
+  'Nellore','Noida','Ongole','Pali','Panaji','Panipat','Parbhani','Patiala','Patna','Pondicherry',
+  'Pune','Raipur','Rajahmundry','Rajkot','Ranchi','Ratlam','Rohtak','Rourkela','Sagar','Saharanpur',
+  'Salem','Sangli','Satara','Shimla','Shimoga','Siliguri','Solapur','Sonipat','Srinagar','Surat',
+  'Thanjavur','Thane','Thiruvananthapuram','Thrissur','Tiruchirappalli','Tirunelveli','Tirupati','Tiruppur',
+  'Tumkur','Udaipur','Ujjain','Vadodara','Varanasi','Vasai-Virar','Vijayawada','Visakhapatnam','Warangal','Yavatmal',
+];
 
 export default function PolicyPage() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [simCity, setSimCity] = useState(user?.city || 'Mumbai');
   const [simWork, setSimWork] = useState(user?.workType || 'full-time');
-  const simPremium = calculatePremium(49, simCity, simWork);
+  const [customCity, setCustomCity] = useState('');
+  const [useCustom, setUseCustom] = useState(false);
+
+  const effectiveCity = useCustom && customCity ? customCity : simCity;
+  const simPremium = calculatePremium(49, effectiveCity, simWork);
+
+  // Get city-specific premium breakdown for the display
+  const userCity = user?.city || 'Mumbai';
+  const userPremium = calculatePremium(49, userCity, user?.workType || 'full-time');
+  const cityProfile = cityRiskProfiles[userCity];
 
   return (
     <div className="space-y-6">
@@ -41,7 +70,7 @@ export default function PolicyPage() {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t('premiumPaid')}</p>
-            <p className="text-lg font-bold text-foreground">{formatCurrency(mockPolicy.totalPremium)}</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(userPremium.total)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t('maxCoverage')}</p>
@@ -62,13 +91,18 @@ export default function PolicyPage() {
         <div className="bg-muted/50 rounded-lg p-4 mb-4 font-mono text-sm text-foreground">
           {t('weekly')} {t('premium')} = {t('baseRate')} + {t('locationRisk')} + {t('weatherRisk')}
         </div>
+        {cityProfile && (
+          <p className="text-xs text-muted-foreground mb-3 italic">
+            {userCity}: {cityProfile.description}
+          </p>
+        )}
         <div className="space-y-3">
-          <PremiumRow label={t('baseRate')} value={mockPolicy.baseRate} desc="Standard weekly rate" />
-          <PremiumRow label={`${t('locationRisk')} (Mumbai)`} value={mockPolicy.locationRisk} desc="High-rainfall zone adjustment" />
-          <PremiumRow label={t('weatherRisk')} value={mockPolicy.weatherRisk} desc="Seasonal monsoon factor" />
+          <PremiumRow label={t('baseRate')} value={userPremium.base} desc="Standard weekly rate for all cities" />
+          <PremiumRow label={`${t('locationRisk')} (${userCity})`} value={userPremium.locationRisk} desc={cityProfile?.description || 'Location-based risk adjustment'} />
+          <PremiumRow label={t('weatherRisk')} value={userPremium.weatherRisk} desc="Seasonal & climate risk factor" />
           <div className="border-t border-border pt-3 flex justify-between items-center">
             <span className="font-bold text-foreground">{t('totalWeeklyPremium')}</span>
-            <span className="text-xl font-bold text-primary">{formatCurrency(mockPolicy.totalPremium)}</span>
+            <span className="text-xl font-bold text-primary">{formatCurrency(userPremium.total)}</span>
           </div>
         </div>
       </div>
@@ -82,14 +116,35 @@ export default function PolicyPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t('city')}</label>
-            <Select value={simCity} onValueChange={setSimCity}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata', 'Pune'].map(c => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {!useCustom ? (
+              <Select value={simCity} onValueChange={(v) => { if (v === '__custom__') { setUseCustom(true); } else { setSimCity(v); } }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {INDIAN_CITIES.map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                  <SelectItem value="__custom__">✏️ Enter custom city...</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={customCity}
+                  onChange={e => setCustomCity(e.target.value)}
+                  placeholder="Enter your city"
+                  className="flex-1"
+                />
+                <button
+                  onClick={() => { setUseCustom(false); setCustomCity(''); }}
+                  className="text-xs text-primary hover:underline whitespace-nowrap self-center"
+                >
+                  Select from list
+                </button>
+              </div>
+            )}
+            {cityRiskProfiles[effectiveCity] && (
+              <p className="text-[10px] text-muted-foreground italic">{cityRiskProfiles[effectiveCity].description}</p>
+            )}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">{t('workType')}</label>

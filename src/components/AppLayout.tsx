@@ -1,6 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AppSidebar from '@/components/AppSidebar';
+import Footer from '@/components/Footer';
 import scootyBg from '@/assets/scooty-bg.png';
 
 export default function AppLayout() {
@@ -30,6 +31,7 @@ export default function AppLayout() {
       <main className="flex-1 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0 relative z-10">
         <div className="p-4 lg:p-8 max-w-7xl mx-auto">
           <Outlet />
+          <Footer />
         </div>
       </main>
     </div>

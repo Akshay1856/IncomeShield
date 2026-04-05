@@ -118,6 +118,10 @@ export default function GetStartedPage() {
             <motion.p variants={fadeUp} className="text-xs pt-2" style={{ color: 'hsl(220, 9%, 50%)' }}>
               15 days free trial · No credit card required
             </motion.p>
+            <motion.div variants={fadeUp} className="flex gap-4 pt-3 text-xs" style={{ color: 'hsl(220, 9%, 50%)' }}>
+              <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
+              <a href="/terms-of-service" className="hover:underline">Terms of Service</a>
+            </motion.div>
           </motion.div>
 
           {/* Right: iPhone Mockup */}

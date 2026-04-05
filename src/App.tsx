@@ -20,6 +20,9 @@ import InstallPage from "@/pages/InstallPage";
 import RoleSelectPage from "@/pages/RoleSelectPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import ProfilePage from "@/pages/ProfilePage";
+import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
+import TermsOfServicePage from "@/pages/TermsOfServicePage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +47,8 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/install" element={<InstallPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms-of-service" element={<TermsOfServicePage />} />
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/policy" element={<PolicyPage />} />
@@ -53,6 +58,7 @@ function AppRoutes() {
         <Route path="/transparency" element={<TransparencyPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
