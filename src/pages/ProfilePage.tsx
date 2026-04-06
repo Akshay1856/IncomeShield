@@ -51,7 +51,13 @@ export default function ProfilePage() {
       if (!user?.id) return;
       const { data } = await supabase.from('profiles').select('avatar_url').eq('user_id', user.id).single();
       if (data?.avatar_url) {
-        setAvatarUrl(data.avatar_url);
+        // If it looks like a path (not a full URL), get a signed URL
+        if (!data.avatar_url.startsWith('http')) {
+          const { data: signedData } = await supabase.storage.from('avatars').createSignedUrl(data.avatar_url, 3600);
+          if (signedData?.signedUrl) setAvatarUrl(signedData.signedUrl);
+        } else {
+          setAvatarUrl(data.avatar_url);
+        }
       } else {
         // Check Google avatar
         const { data: session } = await supabase.auth.getSession();
@@ -88,12 +94,12 @@ export default function ProfilePage() {
       
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      const publicUrl = urlData.publicUrl + '?t=' + Date.now();
-
-      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('user_id', user.id);
+      // Store the file path (not a public URL) since the bucket is private
+      await supabase.from('profiles').update({ avatar_url: filePath }).eq('user_id', user.id);
       
-      setAvatarUrl(publicUrl);
+      // Get a signed URL for display
+      const { data: signedData } = await supabase.storage.from('avatars').createSignedUrl(filePath, 3600);
+      if (signedData?.signedUrl) setAvatarUrl(signedData.signedUrl);
       setShowCropPreview(false);
       setPreviewUrl(null);
       setSelectedFile(null);
