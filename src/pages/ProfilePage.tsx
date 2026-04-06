@@ -51,7 +51,13 @@ export default function ProfilePage() {
       if (!user?.id) return;
       const { data } = await supabase.from('profiles').select('avatar_url').eq('user_id', user.id).single();
       if (data?.avatar_url) {
-        setAvatarUrl(data.avatar_url);
+        // If it looks like a path (not a full URL), get a signed URL
+        if (!data.avatar_url.startsWith('http')) {
+          const { data: signedData } = await supabase.storage.from('avatars').createSignedUrl(data.avatar_url, 3600);
+          if (signedData?.signedUrl) setAvatarUrl(signedData.signedUrl);
+        } else {
+          setAvatarUrl(data.avatar_url);
+        }
       } else {
         // Check Google avatar
         const { data: session } = await supabase.auth.getSession();
