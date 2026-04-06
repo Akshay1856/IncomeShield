@@ -1,19 +1,32 @@
-import { mockClaims, triggerTypeLabels, formatCurrency, formatDateTime } from '@/lib/mockData';
-import { Eye } from 'lucide-react';
+import { triggerTypeLabels, formatCurrency, formatDateTime } from '@/lib/mockData';
+import { Eye, AlertCircle } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useSampleData } from '@/hooks/useSampleData';
+import { SampleDataToggle } from '@/components/SampleDataToggle';
 
 export default function TransparencyPage() {
   const { t } = useTranslation();
-  const transparencyClaims = mockClaims.filter(c => c.status === 'paid' || c.status === 'approved' || c.status === 'pending');
+  const { isLoaded, loadSampleData, clearSampleData, claims, hourlyRate } = useSampleData();
+  const transparencyClaims = claims.filter(c => c.status === 'paid' || c.status === 'approved' || c.status === 'pending');
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Eye className="h-6 w-6 text-primary" /> {t('transparencyLedger')}
-        </h1>
-        <p className="text-muted-foreground">{t('completeExplanation')}</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Eye className="h-6 w-6 text-primary" /> {t('transparencyLedger')}
+          </h1>
+          <p className="text-muted-foreground">{t('completeExplanation')}</p>
+        </div>
+        <SampleDataToggle isLoaded={isLoaded} onLoad={loadSampleData} onClear={clearSampleData} />
       </div>
+
+      {transparencyClaims.length === 0 && (
+        <div className="elevated-card rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3">
+          <AlertCircle className="h-10 w-10 text-muted-foreground" />
+          <p className="text-muted-foreground">No transparency data yet. Load sample data to see how payouts are tracked.</p>
+        </div>
+      )}
 
       {transparencyClaims.map(claim => (
         <div key={claim.id} className="elevated-card rounded-xl p-6 space-y-4">
@@ -42,7 +55,8 @@ export default function TransparencyPage() {
               <ul className="text-sm text-foreground space-y-1">
                 <li>• {t('trigger')}: {claim.triggerValue}</li>
                 <li>• {t('lostHours')}: {claim.lostHours} hrs</li>
-                <li>• Rate: {formatCurrency(125)}/hr</li>
+                <li>• Rate: {formatCurrency(hourlyRate)}/hr</li>
+                <li>• Calculation: {claim.lostHours} × {formatCurrency(hourlyRate)} = {formatCurrency(claim.payoutAmount)}</li>
                 <li>• {t('time')}: {formatDateTime(claim.timestamp)}</li>
               </ul>
             </div>
