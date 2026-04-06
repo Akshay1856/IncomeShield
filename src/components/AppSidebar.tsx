@@ -36,7 +36,7 @@ export default function AppSidebar() {
     { to: '/subscription', label: t('subscription'), icon: CreditCard },
     { to: '/triggers', label: t('triggers'), icon: AlertTriangle },
     { to: '/transparency', label: t('transparency'), icon: Eye },
-    { to: '/profile', label: t('profile') || 'Profile', icon: User },
+    { to: '/profile', label: 'Profile', icon: User },
     { to: '/admin', label: t('admin'), icon: BarChart3 },
   ];
 
