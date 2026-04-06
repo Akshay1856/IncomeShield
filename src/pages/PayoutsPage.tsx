@@ -43,7 +43,7 @@ export default function PayoutsPage() {
   const avgPayout = paidPayouts.length > 0 ? totalPayout / paidPayouts.length : 0;
   const pendingTotal = pendingPayouts.reduce((s, p) => s + p.amount, 0);
 
-  // Build trend data from claims grouped by week
+  // Build trend data - always show 5 weeks minimum
   const payoutTrendData = isLoaded ? (() => {
     const weeks: Record<string, number> = {};
     paidPayouts.forEach(p => {
@@ -52,8 +52,13 @@ export default function PayoutsPage() {
       const key = `W${weekNum}`;
       weeks[key] = (weeks[key] || 0) + p.amount;
     });
-    const entries = Object.entries(weeks).map(([label, amount]) => ({ week: label, amount, label }));
-    return entries.length > 0 ? entries : [{ week: 'W1', amount: 0, label: 'W1' }];
+    // Ensure at least 5 weeks
+    const result: { week: string; amount: number; label: string }[] = [];
+    for (let i = 1; i <= Math.max(5, Object.keys(weeks).length); i++) {
+      const key = `W${i}`;
+      result.push({ week: key, amount: weeks[key] || 0, label: key });
+    }
+    return result;
   })() : [];
 
   const highestWeek = payoutTrendData.length > 0
