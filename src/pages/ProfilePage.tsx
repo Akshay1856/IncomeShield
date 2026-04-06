@@ -88,12 +88,12 @@ export default function ProfilePage() {
       
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      const publicUrl = urlData.publicUrl + '?t=' + Date.now();
-
-      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('user_id', user.id);
+      // Store the file path (not a public URL) since the bucket is private
+      await supabase.from('profiles').update({ avatar_url: filePath }).eq('user_id', user.id);
       
-      setAvatarUrl(publicUrl);
+      // Get a signed URL for display
+      const { data: signedData } = await supabase.storage.from('avatars').createSignedUrl(filePath, 3600);
+      if (signedData?.signedUrl) setAvatarUrl(signedData.signedUrl);
       setShowCropPreview(false);
       setPreviewUrl(null);
       setSelectedFile(null);
