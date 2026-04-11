@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   mockPolicy, mockClaims, mockRiskScore, weeklyEarningsData, riskTrendData,
-  formatCurrency, formatDateTime,
+  formatCurrency, formatDateTime, calculatePremium,
 } from '@/lib/mockData';
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,29 @@ import { useWeatherData } from '@/hooks/useWeatherData';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAIAgent } from '@/contexts/AIAgentContext';
+import { Link } from 'react-router-dom';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const {
+    personalizedPremium,
+    premiumExplainer,
+    rainThresholdMm,
+    heatThresholdC,
+    recordExperience,
+    setPersonalizedFromDashboard,
+    agentState,
+  } = useAIAgent();
   const { t } = useTranslation();
   const geo = useGeolocation();
   const detectedCity = geo.city || user?.city || 'Mumbai';
   const { data: weatherData, loading: weatherLoading, error: weatherError, refetch: refetchWeather } = useWeatherData(detectedCity);
+
+  const basePremiumCalc = calculatePremium(mockPolicy.baseRate, detectedCity, user?.workType || 'full-time');
+  useEffect(() => {
+    void setPersonalizedFromDashboard(basePremiumCalc.total, detectedCity);
+  }, [basePremiumCalc.total, detectedCity, setPersonalizedFromDashboard]);
   const [triggerActive, setTriggerActive] = useState(false);
   const [simulatedClaims, setSimulatedClaims] = useState<Array<{ amount: number; hours: number; txnId: string; claimId: string }>>([]);
   const [simulationCount, setSimulationCount] = useState(0);
@@ -57,9 +73,31 @@ export default function DashboardPage() {
       const txnId = 'TXN_RPY_' + Math.random().toString(36).slice(2, 9).toUpperCase();
       const claimId = `CLM-${String(mockClaims.length + simulationCount + 1).padStart(3, '0')}`;
       setSimulatedClaims(prev => [...prev, { amount: payout, hours, txnId, claimId }]);
+      const ideal = hours * 120;
+      const delta = ideal - payout;
+      recordExperience({
+        event_type: 'payout',
+        inputs: {
+          city: detectedCity,
+          avg_rain_mm: simDisruption.includes('rain') ? 55 : 12,
+          heat_index: simDisruption.includes('heat') ? 46 : 34,
+          hour_of_day: new Date().getHours(),
+          demand_zone_score: 0.7,
+        },
+        decision: {
+          payout_offered: payout,
+          premium_weekly: personalizedPremium ?? mockPolicy.totalPremium,
+        },
+        outcome: {
+          ideal_payout_delta: delta,
+          false_trigger: false,
+        },
+        decision_was_good: Math.abs(delta) < 90,
+        financial_result_inr: Math.min(0, -Math.abs(delta) * 0.2),
+      });
       toast.success(`✅ ${t('payoutProcessed')}: ${formatCurrency(payout)} ${t('credited')}!`, { description: `Transaction: ${txnId}` });
     }, 2500);
-  }, [simDisruption, geo.locality, detectedCity, t, simulationCount]);
+  }, [simDisruption, geo.locality, detectedCity, t, simulationCount, recordExperience, personalizedPremium]);
 
   const resetSimulation = useCallback(() => {
     setTriggerActive(false);
@@ -94,6 +132,9 @@ export default function DashboardPage() {
           <p className="text-xs text-muted-foreground mt-0.5">{t('coverageSnapshot')}</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
+          <Button asChild variant="secondary" size="sm" className="gap-2 btn-3d">
+            <Link to="/ai-agent">AI Agent</Link>
+          </Button>
           {simulationCount > 0 && (
             <span className="text-xs text-muted-foreground">{t('simulated')}: {simulationCount}x</span>
           )}
@@ -209,11 +250,21 @@ export default function DashboardPage() {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard title={t('premium')} value={formatCurrency(mockPolicy.totalPremium)} subtitle={t('weekly')} icon={Shield} variant="default" />
+        <StatCard
+          title={t('premium')}
+          value={formatCurrency(personalizedPremium ?? mockPolicy.totalPremium)}
+          subtitle={personalizedPremium != null ? `AI weekly · cycles ${agentState.learning_cycles}` : t('weekly')}
+          icon={Shield}
+          variant="default"
+        />
         <StatCard title={t('coverage')} value={formatCurrency(mockPolicy.coverageAmount)} subtitle={t('maxPayout')} icon={TrendingUp} variant="accent" />
         <StatCard title={t('protected')} value={formatCurrency(currentEarningsProtected)} subtitle={t('thisWeek')} icon={Zap} variant="safe" />
         <StatCard title={t('lastPayout')} value={formatCurrency(currentLastPayout)} subtitle={currentLastPayoutTime} icon={CheckCircle} variant="safe" />
       </div>
+
+      {premiumExplainer && (
+        <p className="text-xs text-muted-foreground px-1">{premiumExplainer}</p>
+      )}
 
       {/* Risk Score */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
@@ -282,7 +333,7 @@ export default function DashboardPage() {
             value={triggerActive ? '65 mm/hr' : (weatherData?.monitors.rainfall.value || '— mm/hr')}
             status={triggerActive ? 'danger' : (weatherData?.monitors.rainfall.status || 'safe')}
             icon="🌧️"
-            threshold="40mm"
+            threshold={`${rainThresholdMm}mm`}
             subtitle={weatherData ? `Humidity: ${weatherData.conditions.humidity}%` : undefined}
           />
           <MonitorCard
@@ -290,7 +341,7 @@ export default function DashboardPage() {
             value={weatherData?.monitors.temperature.value || '—°C'}
             status={weatherData?.monitors.temperature.status || 'safe'}
             icon="🌡️"
-            threshold="45°C"
+            threshold={`${heatThresholdC}°C`}
             subtitle={weatherData ? `Feels like: ${weatherData.monitors.temperature.feelsLike}°C` : undefined}
           />
           <MonitorCard

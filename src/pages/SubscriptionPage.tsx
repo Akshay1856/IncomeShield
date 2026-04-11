@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, Crown, Shield, Zap } from 'lucide-react';
+import { Check, ArrowRight, Crown, Shield, Zap, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AnimatePresence } from 'framer-motion';
 import RupeeLoadingAnimation from '@/components/RupeeLoadingAnimation';
@@ -9,6 +9,7 @@ import incomeshieldLogo from '@/assets/incomeshield-logo.png';
 import LanguageSelector from '@/components/LanguageSelector';
 import ScootyBackground from '@/components/ScootyBackground';
 import { useTranslation } from '@/hooks/useTranslation';
+import { toast } from 'sonner';
 
 const plans = [
   {
@@ -61,6 +62,7 @@ export default function SubscriptionPage() {
   const [billing, setBilling] = useState<'weekly' | 'monthly'>('monthly');
   const [showLoader, setShowLoader] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>('proShield');
+  const [razorpayMockOpen, setRazorpayMockOpen] = useState(false);
 
   const handleSelectPlan = () => {
     setShowLoader(true);
@@ -184,6 +186,51 @@ export default function SubscriptionPage() {
               );
             })}
           </div>
+
+          {/* Razorpay mock (prototype) */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mt-6 w-full max-w-md rounded-2xl p-4"
+            style={{ background: 'hsl(222, 47%, 11%)', border: '1px solid hsl(222, 30%, 18%)' }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CreditCard className="h-4 w-4" style={{ color: 'hsl(168, 64%, 42%)' }} />
+              <span className="text-sm font-semibold" style={{ color: 'hsl(220, 20%, 93%)' }}>Razorpay (demo)</span>
+            </div>
+            <p className="text-xs mb-3" style={{ color: 'hsl(220, 9%, 55%)' }}>
+              Mock checkout — no real charges. Simulates UPI / card success for IncomeShield renewals.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-primary/40 text-primary-foreground bg-primary/20 hover:bg-primary/30"
+              onClick={() => setRazorpayMockOpen(true)}
+            >
+              Open mock payment
+            </Button>
+            {razorpayMockOpen && (
+              <div className="mt-4 p-3 rounded-xl space-y-2" style={{ background: 'hsl(222, 47%, 8%)' }}>
+                <p className="text-xs font-mono" style={{ color: 'hsl(220, 9%, 65%)' }}>order_incomeshield_demo_001</p>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => {
+                      toast.success('Razorpay mock: payment captured');
+                      setRazorpayMockOpen(false);
+                    }}
+                  >
+                    Pay ₹{billing === 'weekly' ? plans.find((p) => p.nameKey === selectedPlan)?.weeklyPrice : plans.find((p) => p.nameKey === selectedPlan)?.monthlyPrice}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setRazorpayMockOpen(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </motion.div>
 
           {/* Continue Free */}
           <motion.button

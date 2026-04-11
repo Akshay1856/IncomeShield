@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { adminStats, adminMonthlyData, formatCurrency, mockClaims } from '@/lib/mockData';
 import { StatCard } from '@/components/DashboardWidgets';
-import { Users, FileText, IndianRupee, Zap, Download, Lock, ShieldAlert, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Users, FileText, IndianRupee, Zap, Download, Lock, ShieldAlert, AlertTriangle, TrendingUp, Brain } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -111,9 +112,17 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{t('adminDashboard')}</h1>
-        <p className="text-muted-foreground">{t('platformMetrics')}</p>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">{t('adminDashboard')}</h1>
+          <p className="text-muted-foreground">{t('platformMetrics')}</p>
+        </div>
+        <Button asChild variant="secondary" className="gap-2 shrink-0">
+          <Link to="/ai-agent">
+            <Brain className="h-4 w-4" />
+            AI Agent & HER
+          </Link>
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
