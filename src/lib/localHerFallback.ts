@@ -186,7 +186,7 @@ export function seedExperiences(): ExperienceRecord[] {
   ];
 }
 
-export function appendLocalExperience(exp: ExperienceRecord): ExperienceRecord {
+export function loadLocalExperience(exp: ExperienceRecord): ExperienceRecord {
   const list = loadLocalExperiences();
   const id = exp.id || `exp_${list.length}_${Math.random().toString(36).slice(2, 8)}`;
   const withId = { ...exp, id };
