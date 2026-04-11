@@ -1,6 +1,19 @@
 import type { AgentPublicState, ExperienceRecord, LearningCycleResult } from './aiAgentTypes';
-import { defaultAgentState } from './aiAgentTypes';
-import { loadLocalExperience, runLocalLearningCycle, seedExperiences, suggestPremiumLocal, loadLocalExperiences, saveLocalExperiences, loadLocalAgentState, saveLocalAgentState } from './localHerFallback';
+
+import {
+  defaultAgentState,
+  loadLocalExperiences,
+  saveLocalExperiences,
+  loadLocalAgentState,
+  saveLocalAgentState
+} from './aiAgentTypes';
+
+import {
+  appendLocalExperience,
+  runLocalLearningCycle,
+  seedExperiences,
+  suggestPremiumLocal
+} from './localHerFallback';
 
 const BASE = '/api/ai';
 
