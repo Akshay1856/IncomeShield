@@ -15,6 +15,7 @@ import ClaimsPage from "@/pages/ClaimsPage";
 import TriggersPage from "@/pages/TriggersPage";
 import TransparencyPage from "@/pages/TransparencyPage";
 import AdminPage from "@/pages/AdminPage";
+import AdminAIDashboardPage from "@/pages/AdminAIDashboardPage";
 import PayoutsPage from "@/pages/PayoutsPage";
 import InstallPage from "@/pages/InstallPage";
 import RoleSelectPage from "@/pages/RoleSelectPage";
@@ -57,6 +58,7 @@ function AppRoutes() {
         <Route path="/triggers" element={<TriggersPage />} />
         <Route path="/transparency" element={<TransparencyPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/ai" element={<AdminAIDashboardPage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>

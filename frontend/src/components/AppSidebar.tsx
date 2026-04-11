@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   User,
+  Brain,
 } from 'lucide-react';
 import { useState } from 'react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
@@ -38,6 +39,7 @@ export default function AppSidebar() {
     { to: '/transparency', label: t('transparency'), icon: Eye },
     { to: '/profile', label: 'Profile', icon: User },
     { to: '/admin', label: t('admin'), icon: BarChart3 },
+    { to: '/admin/ai', label: 'AI Dashboard', icon: Brain },
   ];
 
   const bottomNavItems = navItems.slice(0, 5);

@@ -2,6 +2,7 @@ from fastapi import FastAPI, APIRouter, HTTPException, BackgroundTasks
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
 import os
 import logging
 from pathlib import Path
@@ -41,6 +42,20 @@ app = FastAPI(title="IncomeShield AI Agent Platform", version="2.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+
+# ==================== Helper Functions ====================
+
+def convert_objectid_to_str(obj):
+    """Convert MongoDB ObjectId to string for JSON serialization"""
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    elif isinstance(obj, dict):
+        return {key: convert_objectid_to_str(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_objectid_to_str(item) for item in obj]
+    else:
+        return obj
 
 
 # ==================== Pydantic Models ====================
@@ -263,6 +278,10 @@ async def get_learning_history(limit: int = 10):
     """Get recent learning cycles"""
     try:
         history = await hindsight_system.get_learning_history(limit)
+        
+        # Convert ObjectIds to strings
+        history = convert_objectid_to_str(history)
+        
         return {"learning_history": history}
     except Exception as e:
         logger.error(f"Learning history error: {e}")
@@ -276,6 +295,9 @@ async def get_all_models():
     """Get all AI model metadata and performance"""
     try:
         models = await hindsight_system.get_model_metadata()
+        
+        # Convert ObjectIds to strings
+        models = convert_objectid_to_str(models)
         
         # Add current performance from agents
         model_performance = {
@@ -299,6 +321,10 @@ async def get_model_details(agent_name: str):
     """Get specific model details"""
     try:
         models = await hindsight_system.get_model_metadata(agent_name)
+        
+        # Convert ObjectIds to strings
+        models = convert_objectid_to_str(models)
+        
         return {"model": models[0] if models else None}
     except Exception as e:
         logger.error(f"Model details error: {e}")

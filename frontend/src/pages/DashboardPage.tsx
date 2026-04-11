@@ -5,6 +5,7 @@ import {
   formatCurrency, formatDateTime,
 } from '@/lib/mockData';
 import { RiskGauge, StatCard, RiskExplanation, StatusBadge } from '@/components/DashboardWidgets';
+import { AIInsightsCard } from '@/components/AIInsights';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -214,6 +215,15 @@ export default function DashboardPage() {
         <StatCard title={t('protected')} value={formatCurrency(currentEarningsProtected)} subtitle={t('thisWeek')} icon={Zap} variant="safe" />
         <StatCard title={t('lastPayout')} value={formatCurrency(currentLastPayout)} subtitle={currentLastPayoutTime} icon={CheckCircle} variant="safe" />
       </div>
+
+      {/* AI Insights Card */}
+      <AIInsightsCard
+        city={detectedCity}
+        workType={user?.workType || 'full-time'}
+        platform={user?.platform || 'Zomato'}
+        claimFrequency={simulationCount > 0 ? simulationCount / 4 : 0.5}
+        avgEarnings={5000}
+      />
 
       {/* Risk Score */}
       <div className="elevated-card rounded-xl p-4 lg:p-6">
