@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AIAgentProvider } from "@/contexts/AIAgentContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import AppLayout from "@/components/AppLayout";
@@ -15,6 +16,7 @@ import ClaimsPage from "@/pages/ClaimsPage";
 import TriggersPage from "@/pages/TriggersPage";
 import TransparencyPage from "@/pages/TransparencyPage";
 import AdminPage from "@/pages/AdminPage";
+import AILabPage from "@/pages/AILabPage";
 import PayoutsPage from "@/pages/PayoutsPage";
 import InstallPage from "@/pages/InstallPage";
 import RoleSelectPage from "@/pages/RoleSelectPage";
@@ -57,6 +59,7 @@ function AppRoutes() {
         <Route path="/triggers" element={<TriggersPage />} />
         <Route path="/transparency" element={<TransparencyPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/ai-agent" element={<AILabPage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
@@ -73,7 +76,9 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
-              <AppRoutes />
+              <AIAgentProvider>
+                <AppRoutes />
+              </AIAgentProvider>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
