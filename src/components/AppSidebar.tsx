@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   User,
+  Brain,
 } from 'lucide-react';
 import { useState } from 'react';
 import incomeshieldLogo from '@/assets/incomeshield-logo.png';
@@ -36,6 +37,7 @@ export default function AppSidebar() {
     { to: '/subscription', label: t('subscription'), icon: CreditCard },
     { to: '/triggers', label: t('triggers'), icon: AlertTriangle },
     { to: '/transparency', label: t('transparency'), icon: Eye },
+    { to: '/ai-agent', label: 'AI Agent', icon: Brain },
     { to: '/profile', label: 'Profile', icon: User },
     { to: '/admin', label: t('admin'), icon: BarChart3 },
   ];
