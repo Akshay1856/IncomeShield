@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import {
   Brain, Play, RefreshCw, Shield, AlertTriangle, Sparkles, Activity, Gavel, Users, Cpu, CheckCircle2,
+  Siren, BadgeIndianRupee, UserPlus, Repeat, LockKeyhole,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import CoverageMapPreview from '@/components/CoverageMapPreview';
@@ -49,6 +50,7 @@ export default function AILabPage() {
 
   const [cycleRunning, setCycleRunning] = useState(false);
   const [history, setHistory] = useState<{ cycle: number; loss: number; version: number }[]>([]);
+  const [demoStep, setDemoStep] = useState(0);
 
   const city = user?.city || 'Mumbai';
   const baseCalc = useMemo(() => calculatePremium(mockPolicy.baseRate, city, user?.workType || 'full-time'), [city, user?.workType]);
@@ -121,6 +123,124 @@ export default function AILabPage() {
     toast.message('Experience logged', { description: good ? 'Payout near fair (good).' : `Δ vs ideal: ₹${delta.toFixed(0)} — stored for HER.` });
   };
 
+  const logSyntheticExperience = (event: 'pricing' | 'trigger' | 'fraud' | 'payout' | 'retention') => {
+    if (event === 'pricing') {
+      const tooHigh = Math.random() > 0.4;
+      recordExperience({
+        event_type: 'pricing',
+        inputs: { city, claim_frequency_30d: 2 + Math.random() * 3, avg_rain_mm: 30 + Math.random() * 25, traffic_index: 0.5 + Math.random() * 0.4 },
+        decision: { premium_weekly: tooHigh ? 106 : 62 },
+        outcome: { user_churned: tooHigh, loss_ratio: tooHigh ? 0.28 : 0.58, renewed: tooHigh ? 0 : 1 },
+        decision_was_good: false,
+        financial_result_inr: tooHigh ? -180 : -620,
+      });
+      toast.message('Pricing experience added', { description: 'Adaptive pricing agent now has a new hindsight sample.' });
+      return;
+    }
+
+    if (event === 'trigger') {
+      const missed = Math.random() > 0.5;
+      recordExperience({
+        event_type: 'trigger',
+        inputs: { city, avg_rain_mm: 34 + Math.random() * 20 },
+        decision: { rain_threshold_mm: rainThresholdMm, heat_threshold_c: heatThresholdC },
+        outcome: { missed_trigger: missed, false_trigger: !missed },
+        decision_was_good: false,
+        financial_result_inr: missed ? -350 : -210,
+      });
+      toast.message('Trigger event stored', { description: missed ? 'Missed payout case captured for hindsight replay.' : 'False trigger case captured for replay.' });
+      return;
+    }
+
+    if (event === 'fraud') {
+      const missedFraud = Math.random() > 0.5;
+      recordExperience({
+        event_type: 'fraud',
+        inputs: { city, gps_anomaly_score: missedFraud ? 0.16 : 0.04, impossible_speed_kmh: missedFraud ? 88 : 18 },
+        decision: { fraud_score: missedFraud ? 0.25 : 0.83 },
+        outcome: { fraud_missed: missedFraud, false_fraud_flag: !missedFraud, coordinated_abuse: missedFraud },
+        decision_was_good: false,
+        financial_result_inr: missedFraud ? -780 : -95,
+      });
+      toast.message('Fraud event stored', { description: missedFraud ? 'Missed abuse pattern saved.' : 'False positive stored to reduce strictness.' });
+      return;
+    }
+
+    if (event === 'retention') {
+      const renewed = Math.random() > 0.45;
+      recordExperience({
+        event_type: 'retention',
+        inputs: { city, reminder_type: renewed ? 'explainability' : 'generic', discount_offered: renewed ? 0 : 10 },
+        decision: { intervention: renewed ? 'clear_claim_explanation' : 'late_push_notification' },
+        outcome: { renewed: renewed ? 1 : 0, user_churned: renewed ? 0 : 1 },
+        user_response: renewed ? 'Understood payout logic and renewed.' : 'Did not trust premium change.',
+        decision_was_good: renewed,
+        financial_result_inr: renewed ? 240 : -140,
+      });
+      toast.message('Retention event stored', { description: 'Engagement agent can now relearn intervention quality.' });
+      return;
+    }
+
+    handleDemoPayout();
+  };
+
+  const runGuidedDemo = async () => {
+    const next = (demoStep + 1) % DEMO_STEPS.length;
+    setDemoStep(next);
+
+    if (next === 0) {
+      recordExperience({
+        event_type: 'retention',
+        inputs: { city, onboarding_complete: true },
+        decision: { recommended_plan: 'Starter Shield' },
+        outcome: { renewed: 1, user_churned: false },
+        user_response: 'New user joined and accepted onboarding.',
+        decision_was_good: true,
+        financial_result_inr: 80,
+      });
+      toast.message('Step 1 complete', { description: DEMO_STEPS[next] });
+      return;
+    }
+    if (next === 1) {
+      await setPersonalizedFromDashboard(baseCalc.total, city);
+      toast.message('Step 2 complete', { description: DEMO_STEPS[next] });
+      return;
+    }
+    if (next === 2) {
+      logSyntheticExperience('trigger');
+      toast.message('Step 3 complete', { description: DEMO_STEPS[next] });
+      return;
+    }
+    if (next === 3) {
+      handleDemoPayout();
+      toast.message('Step 4 complete', { description: DEMO_STEPS[next] });
+      return;
+    }
+    if (next === 4) {
+      toast.message('Step 5 complete', { description: 'Outcome already persisted in Experience Memory Store.' });
+      return;
+    }
+    if (next === 5) {
+      await onRunLearning();
+      toast.message('Step 6 complete', { description: DEMO_STEPS[next] });
+      return;
+    }
+    toast.message('Step 7 complete', { description: DEMO_STEPS[next] });
+  };
+
+  const moduleStats = useMemo(() => {
+    const recent = experiences.slice(-40);
+    const by = (type: typeof recent[number]['event_type']) => recent.filter((e) => e.event_type === type);
+    const quality = (arr: typeof recent) => arr.length ? (arr.filter((e) => e.decision_was_good).length / arr.length) * 100 : 0;
+    return {
+      pricing: { total: by('pricing').length, quality: quality(by('pricing')) },
+      trigger: { total: by('trigger').length, quality: quality(by('trigger')) },
+      fraud: { total: by('fraud').length, quality: quality(by('fraud')) },
+      payout: { total: by('payout').length, quality: quality(by('payout')) },
+      retention: { total: by('retention').length, quality: quality(by('retention')) },
+    };
+  }, [experiences]);
+
   return (
     <div className="space-y-6 pb-24 lg:pb-8">
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
@@ -139,6 +259,10 @@ export default function AILabPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" size="sm" className="gap-2" onClick={() => void runGuidedDemo()}>
+            <Repeat className="h-4 w-4" />
+            Run next demo step
+          </Button>
           <Button variant="outline" size="sm" onClick={() => void refresh()} disabled={loading} className="gap-2">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Sync
@@ -150,7 +274,7 @@ export default function AILabPage() {
         </div>
       </div>
 
-      <Card className="border-primary/20 bg-primary/5">
+        <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
@@ -164,6 +288,37 @@ export default function AILabPage() {
               <li key={s} className="text-muted-foreground"><span className="text-foreground">{s}</span></li>
             ))}
           </ol>
+        </CardContent>
+        </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Autonomous agent modules (event simulator)</CardTitle>
+          <CardDescription>
+            Simulate failed or successful outcomes across all 5 AI agents, then replay via HER.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid sm:grid-cols-2 lg:grid-cols-5 gap-2">
+          <Button variant="outline" size="sm" className="justify-start gap-2" onClick={() => logSyntheticExperience('pricing')}>
+            <BadgeIndianRupee className="h-4 w-4" />
+            Pricing ({moduleStats.pricing.total})
+          </Button>
+          <Button variant="outline" size="sm" className="justify-start gap-2" onClick={() => logSyntheticExperience('trigger')}>
+            <Siren className="h-4 w-4" />
+            Trigger ({moduleStats.trigger.total})
+          </Button>
+          <Button variant="outline" size="sm" className="justify-start gap-2" onClick={() => logSyntheticExperience('fraud')}>
+            <LockKeyhole className="h-4 w-4" />
+            Fraud ({moduleStats.fraud.total})
+          </Button>
+          <Button variant="outline" size="sm" className="justify-start gap-2" onClick={() => logSyntheticExperience('payout')}>
+            <Gavel className="h-4 w-4" />
+            Payout ({moduleStats.payout.total})
+          </Button>
+          <Button variant="outline" size="sm" className="justify-start gap-2" onClick={() => logSyntheticExperience('retention')}>
+            <UserPlus className="h-4 w-4" />
+            Retention ({moduleStats.retention.total})
+          </Button>
         </CardContent>
       </Card>
 
@@ -301,6 +456,30 @@ export default function AILabPage() {
             </Card>
           </div>
 
+          <Card className="elevated-card">
+            <CardHeader>
+              <CardTitle className="text-sm">Agent quality by module (recent memory)</CardTitle>
+              <CardDescription>Decision-good rate across pricing, trigger, fraud, payout, retention.</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { m: 'Pricing', q: moduleStats.pricing.quality },
+                  { m: 'Trigger', q: moduleStats.trigger.quality },
+                  { m: 'Fraud', q: moduleStats.fraud.quality },
+                  { m: 'Payout', q: moduleStats.payout.quality },
+                  { m: 'Retention', q: moduleStats.retention.quality },
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="m" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(v) => [`${Number(v).toFixed(1)}%`, 'Quality']} />
+                  <Bar dataKey="q" fill="hsl(var(--safe))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-sm flex items-center gap-2">
@@ -394,20 +573,27 @@ export default function AILabPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Experience memory log</CardTitle>
-          <CardDescription>Event type · decision quality · financial outcome (newest first)</CardDescription>
+          <CardDescription>Event type · decision · final outcome · user response · fraud status · financial result</CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[280px] pr-3">
             <div className="space-y-2 font-mono text-xs">
               {[...experiences].reverse().slice(0, 40).map((e) => (
-                <div key={e.id} className="flex flex-wrap gap-2 items-center border-b border-border pb-2">
+                <div key={e.id} className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-2 border-b border-border pb-2">
+                  <div className="flex flex-wrap gap-2 items-center">
                   <Badge variant="outline">{e.event_type}</Badge>
                   <span className={e.decision_was_good ? 'text-safe' : 'text-warning'}>
                     {e.decision_was_good ? 'good' : 'suboptimal'}
                   </span>
                   <span className="text-muted-foreground truncate max-w-[200px]">{e.id}</span>
+                  </div>
+                  <div className="text-[10px] text-muted-foreground break-words">
+                    decision: {JSON.stringify(e.decision)} · outcome: {JSON.stringify(e.outcome)}
+                    {e.user_response ? ` · user: ${e.user_response}` : ''}
+                    {e.fraud_status ? ` · fraud: ${e.fraud_status}` : ''}
+                  </div>
                   {e.financial_result_inr != null && (
-                    <span>₹{Number(e.financial_result_inr).toFixed(0)}</span>
+                    <span className="text-right">₹{Number(e.financial_result_inr).toFixed(0)}</span>
                   )}
                 </div>
               ))}
